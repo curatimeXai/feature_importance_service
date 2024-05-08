@@ -1,0 +1,428 @@
+library("shiny")
+library("shinyjs")
+library("shinyBS")
+library("shinydashboard")
+library("shinycssloaders")
+library("shinyWidgets")
+library("DALEX")
+library("ggplot2")
+
+# Additional models libraries used
+library(stats)
+library(ranger)
+
+
+# Loading explainers from created files
+
+explainer1 <- readRDS("/home/alex/UniProjects/BachelorXAI/explainers/explainer_svm.rds")
+# explainer2 <- readRDS("exp2.rds")
+
+# Assuming data is the same among explainers, so loading it from the first one is acceptable in this case
+data <- explainer1$data
+# Observation created based on average (numeric features) and
+# most frequent (categorical features) data for each column
+temp_data <- data[c('age','sex','cp','trestbps','chol','fbs','restecg','thalach','exang','oldpeak','slope','ca','thal')]
+print(colnames(data))
+
+chosen_observation <- suppressWarnings({as.data.frame(t(sapply(temp_data, function(x) {round(mean(x), 2)} )))})
+chosen_observation_cat_help <- as.data.frame(t(sapply(temp_data, function(x) {names(sort(table(x), decreasing = T, na.last = T)[1])})))
+
+# Filling NA values for categorical features
+for(name in names(chosen_observation)) {
+  if(is.na(chosen_observation[name])) {
+    chosen_observation[name] <- chosen_observation_cat_help[name]
+  }
+}
+print("t1")
+# Creating proper dropdown menu to choose explainers from
+dropdownActionMenu <- function (..., title=NULL, icon = NULL, .list = NULL, header=NULL) {
+  items <- c(list(...), .list)
+
+  # Asserting whether all tags passed are HTML list elements
+  lapply(items, shinydashboard:::tagAssert, type = "li")
+
+  # Specyfing list elements
+  type <- "notifications"
+  tags$li(class = paste0("dropdown ", type, "-menu"),
+          a(href = "#", class = "dropdown-toggle", `data-toggle` = "dropdown", icon, title),
+          tags$ul(class = "dropdown-menu", if(!is.null(header)) tags$li(class="header",header), tags$li(tags$ul(class = "menu", items))))
+}
+
+
+
+ui <- dashboardPage(
+    skin = "purple",
+
+    # Header which includes a dashboard title and an unordered list of deployed explainers
+    dashboardHeader(title = "xai2shiny",
+                    dropdownActionMenu(title="Chosen explainer"
+                                       , icon = icon("arrow-circle-down")
+                                       , tags$li(class = "dropdown", actionBttn("exp1", explainer1$label, style = "fill", block = TRUE)), tags$li(class = "dropdown", actionBttn("exp2", explainer2$label, style = "fill", block = TRUE))
+                                       )
+                    ),
+
+    # Sidebar containing all modifiable elements of the dashboard
+    dashboardSidebar(
+        sidebarMenu(
+
+            # Sidebar menu element for model exploration
+            menuItem(p(id = "menu1", "Model exploration"),
+                    tabName = "dashboard",
+                    icon = icon("arrow-circle-right")),
+
+            # Checkboxes
+            checkboxGroupButtons(
+              inputId = "selected_features",
+              label = "Select dashboard features:",
+              choices = c("Local explanations", "Global explanations", "Model performance", "Text description"),
+              selected = c("Local explanations", "Model performance"),
+              direction = "vertical",
+              justified = TRUE,
+              status = "primary",
+              checkIcon = list(yes = icon("ok", lib = "glyphicon"), no = icon("remove", lib = "glyphicon"))
+            ),
+
+            # Additional styling
+            tags$script("$(\"input:checkbox[name='selected_features'][value='Local explanations']\").parent().css('background-color', '#483D8B');"),
+            tags$script("$(\"input:checkbox[name='selected_features'][value='Global explanations']\").parent().css('background-color', '#1958a6');"),
+            tags$script("$(\"input:checkbox[name='selected_features'][value='Model performance']\").parent().css('background-color', '#634A87');"),
+            tags$script("$(\"input:checkbox[name='selected_features'][value='Text description']\").parent().css('background-color', '#46425E');"),
+
+            pickerInput(
+              inputId = "selected_columns",
+              label = "Select variables to modify:",
+              choices = c('age','sex','cp','trestbps','chol','fbs','restecg','thalach','exang','oldpeak','slope','ca','thal'),
+              selected = c('sex','age'),
+              options = list(
+                `actions-box` = TRUE,
+                size = 12,
+                `selected-text-format` = "static",
+                `none-selected-text` = 'Expand the list and choose'
+              ),
+              multiple = TRUE
+            ),
+
+            hr(),
+            h4("Modify variables below:"),
+
+            # Model variables input
+            uiOutput('vars_input'),
+            width = 3,
+
+            # Sidebar menu element for XAI resources
+            menuItem(p(id = "menu2", "Learn more about XAI"), tabName = "xai_resources", icon = icon("th")),
+
+            # Additional styling
+            tags$style(type="text/css",
+                       ".shiny-output-error { visibility: hidden; }",
+                       ".shiny-output-error:before { visibility: hidden; }",
+                       "h4 { display:block; margin-left: 0.8em; }"
+            )
+        )
+    ),
+
+    # Main dashboard body
+    # Includes both explanations and XAI resources tabs
+    dashboardBody(
+        # Make dashboard background color overflow automaticaly to content
+        tags$head(tags$style(HTML('.content-wrapper { overflow: auto; }'))),
+        # Use shinyjs to show/hide objects
+        shinyjs::useShinyjs(),
+        tabItems(
+
+            # Explanations tab
+            tabItem(tabName = "dashboard",
+
+                    fluidRow(
+                        hidden(
+                          div(id = "global",
+
+                            # Global: Feature importance
+                            box(title = p(id = "tab5", "Model Parts",
+                                          tags$span(icon("info-circle"), id = "icon_feature_importance", style = "color: #C0C0C0;")),
+                                bsPopover("icon_feature_importance",
+                                          title = "What is Model Parts?",
+                                          content = paste("By using different methods it is able to measure how much models rely on given variables.",
+                                                          "Check \"Learn more about XAI\" tab for more!", sep = "<br>"),
+                                          placement = "right",
+                                          options = list(container = 'body')),
+                                background = "blue",
+                                solidHeader = TRUE,
+                                collapsible = TRUE,
+                                width = 6,
+                                height = 350,
+                                withSpinner(plotOutput("plot_fi", height = 260), hide.ui = FALSE)),
+
+                            # Global: Partial-Depencende plot
+                            box(title = p(id = "tab6", "Model Profile",
+                                          tags$span(icon("info-circle"), id = "icon_model_profile", style = "color: #C0C0C0;")),
+                                bsPopover("icon_model_profile",
+                                          title = "What is Model Profile?",
+                                          content = paste('Partial Dependence is an expected value of Ceteris Paribus (Predict Profile) function across whole dataset.',
+                                                          "Check \"Learn more about XAI\" tab for more!", sep = "<br>"),
+                                          placement = "right",
+                                          options = list(container = 'body')),
+                                background = "blue", solidHeader = TRUE,
+                                collapsible = TRUE,
+                                width = 6,
+                                height = 350,
+                                column(width = 3, uiOutput("variable_pdp")),
+                                column(width = 9, withSpinner(plotOutput("plot_pdp", height = 260), hide.ui = FALSE)))
+                    ))),
+
+                    fluidRow(
+
+                        # Prediction & Model performance
+                        div(id = "model_perf",
+                          column(width = 4,
+                                  box(title = p(id = "tab1", "Prediction"),
+                                      background = "purple",
+                                      solidHeader = TRUE,
+                                      collapsible = TRUE,
+                                      width = 800,
+                                      height = 130,
+                                      p('The predicted probability is:'),
+                                      withSpinner(uiOutput("text_pred"), hide.ui = FALSE)),
+                                  box(title = p(id = "tab2", "Model Performance",
+                                                tags$span(icon("info-circle"), id = "icon_performance", style = "color: #C0C0C0;")),
+                                      bsPopover("icon_performance",
+                                                title = "What is Model Performance?",
+                                                content = paste('Below you can find one of sound methods used to measure model`s quality (respecting regression / classification division).',
+                                                                "Check \"Learn more about XAI\" tab for more!", sep = "<br>"),
+                                                placement = "right",
+                                                options = list(container = 'body')),
+                                      background = "blue",
+                                      solidHeader = TRUE,
+                                      collapsible = TRUE,
+                                      width = 800,
+                                      height = NULL,
+                                      withSpinner(plotOutput("plot_modelperf", height = 360), hide.ui = FALSE),
+                                      htmlOutput("text_performance"))
+                                  )
+                        ),
+
+                        div(id = "local",
+
+                          # Local: breakdown/ shap values
+                          box(title = p(id = "tab3", "Predict Parts",
+                                        tags$span(icon("info-circle"), id = "icon_predict_parts", style = "color: #C0C0C0;")),
+                              bsPopover("icon_predict_parts",
+                                        title = "What is Predict Parts?",
+                                        content = paste("Here you can find particular features values impact on the final prediction",
+                                                         "Check \"Learn more about XAI\" tab for more!", sep = "<br>"),
+                                        placement = "right",
+                                        options = list(container = 'body')),
+                              background = "purple",
+                              solidHeader = TRUE,
+                              collapsible = TRUE,
+                              width = 4,
+                              height = NULL,
+                              selectInput(inputId = "pptype",
+                                          label = 'Type of variable attributions:',
+                                          choices = c("SHAP" = "shap", "Break Down" = "break_down"),
+                                          selected = "break_down"),
+                              withSpinner(plotOutput("plot_bd", height = 400), hide.ui = FALSE),
+                              textOutput("text_predictprofile")),
+
+                          # Local: Ceteris paribus
+                          box(title = p(id = "tab4", "Predict Profile",
+                                        tags$span(icon("info-circle"), id = "icon_predict_profile", style = "color: #C0C0C0;")),
+                              bsPopover("icon_predict_profile",
+                                        title = "What is Predict Profile?",
+                                        content = paste("In this visualization you can find prediction response to specific feature alterations.",
+                                                        "Check \"Learn more about XAI\" tab for more!", sep = "<br>"),
+                                        placement = "right",
+                                        options = list(container = 'body')),
+                              background = "purple",
+                              solidHeader = TRUE,
+                              collapsible = TRUE,
+                              width = 4,
+                              height = NULL,
+                              uiOutput("variable_cp"),
+                              withSpinner(plotOutput("plot_cp", height = 400), hide.ui = FALSE),
+                              textOutput("text_ceterisparibus"))
+                    )),
+
+                    tags$footer(style = "width: 100%; background-color: #605ca8; text-align: center; color: white; font-size: 115%;
+                            padding: 5px 10px 1px 10px; border-radius: 10px; box-shadow: 5px 5px 15px -5px #444;",
+                    HTML('<p>App built with: <a style="color: #c8c3dc;" href="https://github.com/ModelOriented/xai2shiny">xai2shiny</a></p>'),
+                    HTML(paste0("<p>Last update date: ", Sys.time(), "</p>")))
+
+            ),
+
+            # XAI resources tab
+            tabItem(tabName = "xai_resources",
+                    column(7, includeHTML("learn_more_about_xai.html"))
+            )
+        )
+    )
+)
+
+
+
+server <- function(input, output, session) {
+
+    # Setting up observation to predict on
+    new_observation <- reactive({
+      obs <- list(gender = factor(input$gender, levels = levels(data$gender)) 
+			, age = as.numeric(input$age) 
+			, class = factor(input$class, levels = levels(data$class)) 
+			, embarked = factor(input$embarked, levels = levels(data$embarked)) 
+			, fare = as.numeric(input$fare) 
+			, sibsp = as.numeric(input$sibsp) 
+			, parch = as.numeric(input$parch) 
+			)
+      nulls <- sapply(obs, function(x) length(x) == 0)
+      obs[nulls] <- as.list(chosen_observation)[nulls]
+      as.data.frame(obs)
+    })
+
+    # Loading explainer, default is the first one passed to a generating function
+    exp <- reactiveValues(data = explainer1)
+    
+	observeEvent(input$exp1, { exp$data <- explainer1 })
+	observeEvent(input$exp2, { exp$data <- explainer2 })
+
+    # Calculating a prediction
+    pred <- reactive({
+        round(predict(exp$data, new_observation()), 4)
+    })
+
+    # Rendering DALEX text describing explanations performance
+    output$text_pred <- renderUI({ strong(paste0(pred())) })
+    output$text_predictprofile <- renderText({ if("Text description" %in% input$selected_features) iBreakDown::describe(pp()) else "" })
+    output$text_ceterisparibus <- renderText({ if("Text description" %in% input$selected_features) ingredients::describe(cp()) else "" })
+    output$text_performance <- renderText({
+      if("Text description" %in% input$selected_features){
+          perf <- model_performance(exp$data)
+          if(perf$type == "regression") {
+              paste0("Performance measures for ", perf$type,
+                    ":<br>MSE: ", round(perf$measures$mse, 3),
+                    "<br>RMSE: ", round(perf$measures$rmse, 3),
+                    "<br>R2: ", round(perf$measures$r2, 3),
+                    "<br>MAD: ", round(perf$measures$mad, 3))
+          } else {
+              paste0("Performance measures for ", perf$type,
+                    ":<br>Accuracy: ", round(perf$measures$accuracy, 3),
+                    "<br>AUC: ", round(perf$measures$auc, 3),
+                    "<br>Recall: ", round(perf$measures$recall, 3),
+                    "<br>Precision: ", round(perf$measures$precision, 3),
+                    "<br>F1: ", round(perf$measures$f1, 3))
+          }
+      } else ""
+    })
+
+    # Calculating XAI functionalities based on set observation
+    pp <- reactive({ predict_parts(exp$data, new_observation(), type = input$pptype) })
+    cp <- reactive({ predict_profile(exp$data, new_observation(), input$cp1) })
+
+    # Plotting
+    output$plot_bd <- renderPlot({
+        if(input$pptype == "shap"){
+          plot(pp()) + ggplot2::ggtitle("SHAP\n")
+        }
+        else{
+          plot(pp())
+        }
+    })
+
+    output$plot_cp <- renderPlot({
+        plot(cp(), variables = input$cp1) + ggplot2::labs(subtitle="")
+    })
+
+    output$plot_modelperf <- renderPlot({
+        perf <- model_performance(exp$data)
+        if(perf$type == "regression"){
+          plot(perf)
+        }
+        else{
+          plot(perf, geom = "roc")
+        }
+    })
+
+    output$plot_fi <- renderPlot({
+        mp <- model_parts(exp$data)
+        plot(mp) + ggplot2::labs(subtitle = "")
+    })
+
+    output$plot_pdp <- renderPlot({
+        pdp <- model_profile(exp$data, variables = input$pdp1)
+        plot(pdp) + ggplot2::labs(subtitle = "")
+    })
+
+    output$variable_cp <- renderUI({
+        selectInput(inputId = "cp1",
+                    label = "The profiles will be calculated for:",
+                    choices = input$selected_columns,
+                    selected = input$selected_columns[1])
+    })
+
+    output$variable_pdp <- renderUI({
+      selectInput(inputId = "pdp1",
+                  label = "The profiles will be calculated for:",
+                  choices = input$selected_columns,
+                  selected = input$selected_columns[1])
+    })
+
+    # Logic based on selected features (local/global explanations, model performance, text description)
+    observe({
+      if (is.null(input$selected_features) ){
+        shinyjs::hide("local")
+        shinyjs::hide("global")
+        shinyjs::hide("model_perf")
+      }
+    })
+
+    observeEvent(input$selected_features, {
+
+        if("Local explanations" %in% input$selected_features) {
+          shinyjs::show("local")
+        } else {
+          shinyjs::hide("local")
+        }
+
+        if("Global explanations" %in% input$selected_features) {
+          shinyjs::show("global")
+        } else {
+          shinyjs::hide("global")
+        }
+
+        if("Model performance" %in% input$selected_features) {
+          shinyjs::show("model_perf")
+        } else {
+          shinyjs::hide("model_perf")
+        }
+    })
+
+    # Rendering proper variables input on the sidebar
+    output$vars_input <- renderUI({
+
+        selected_columns <- input$selected_columns
+
+        lapply(1:length(selected_columns), function(i) {
+          var_values <- data[, colnames(data) == selected_columns[i]]
+          if(class(var_values) == 'factor') {
+            selectInput(inputId = selected_columns[i],
+                        label = selected_columns[i],
+                        choices = levels(var_values),
+                        selected = chosen_observation[[selected_columns[i]]])}
+          else {
+            if(all(floor(var_values) == var_values)){
+              step <- 1
+            }
+            else{
+              step <- signif(min(abs(diff(unique(var_values)))))
+            }
+            sliderInput(inputId = selected_columns[i],
+                        label = selected_columns[i],
+                        min = round(min(var_values, na.rm = TRUE)),
+                        max = round(max(var_values, na.rm = TRUE)),
+                        step = step,
+                        value = chosen_observation[[selected_columns[i]]])
+          }
+        })
+  })
+}
+
+shinyApp(ui = ui, server = server)
+
