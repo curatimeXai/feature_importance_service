@@ -10,3 +10,5 @@
 /.idea/rGraphicsSettings.xml
 /.idea/rpackages.xml
 /.idea/rSettings.xml
+/src/explainers/
+/src/models/

@@ -19,8 +19,8 @@ if do_train or not classifier.model_is_saved(model_path):
     classifier.plot_accuracy(accuracies)
     plt.show()
 
-classifier.load_explainer(explainer_path=explainer_path)
-classifier.save_explainer(explainer_path)
+classifier.load_dalex_explainer(explainer_path=explainer_path)
+classifier.save_dalex_explainer(explainer_path)
 test_accuracy = classifier.test_accuracy()
 log_likelihood = classifier.log_likelihood()
 print(f"Final Testing Acc: {test_accuracy} Likelihood: {log_likelihood}")
