@@ -102,7 +102,7 @@ class HeartDiseaseClassifier:
 model_path=None
 # explainer_path="/home/alex/UniProjects/BachelorXAI/python/explainers/svm_explainer.pkl"
 explainer_path=None
-data_path='/home/alex/UniProjects/BachelorXAI/datasets/dataset_2020_2022/2020/heart_2020_cleaned_numerical.csv'
+data_path= '/datasets/dataset_2020_2022/2020/heart_2020_cleaned_numerical.csv'
 do_train=True
 classifier = HeartDiseaseClassifier(data_path,
                                     sample_size=100)

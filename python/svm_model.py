@@ -100,9 +100,9 @@ class HeartDiseaseClassifier:
         joblib.dump(self.explainer, filename)
 # Example usage:
 model=SVC(kernel='poly')
-model_path="/home/alex/UniProjects/BachelorXAI/python/models/svm_model.pkl"
-explainer_path="/home/alex/UniProjects/BachelorXAI/python/explainers/svm_explainer.pkl"
-data_path='/home/alex/UniProjects/BachelorXAI/datasets/dataset_2020_2022/2020/heart_2020_cleaned_numerical.csv'
+model_path= "/src/models/svm_model.pkl"
+explainer_path= "/src/explainers/svm_explainer.pkl"
+data_path= '/datasets/dataset_2020_2022/2020/heart_2020_cleaned_numerical.csv'
 do_train=True
 classifier = HeartDiseaseClassifier(data_path,
                                     sample_size=100)

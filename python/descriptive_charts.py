@@ -61,17 +61,17 @@ class DescriptiveCharts:
         plt.title(f"Distribution of {col}")
         plt.show()
 
-data_path='/home/alex/UniProjects/BachelorXAI/datasets/dataset_2020_2022/2020/heart_2020_cleaned_numerical.csv'
-descriptive = DescriptiveCharts(data_path)
-descriptive.data['BMI_Rounded'] = descriptive.data['BMI'].round().astype(int)
-
-
-descriptive.box_plot('AgeCategory')
-descriptive.plot_a_and_b('BMI_Rounded')
-descriptive.plot_a_and_b('AgeCategory')
-descriptive.plot_distribution('AgeCategory')
-descriptive.plot_a_and_b('PhysicalHealth')
-descriptive.plot_a_given_b('PhysicalHealth')
+# data_path= '/datasets/dataset_2020_2022/2020/heart_2020_cleaned_numerical.csv'
+# descriptive = DescriptiveCharts(data_path)
+# descriptive.data['BMI_Rounded'] = descriptive.data['BMI'].round().astype(int)
+#
+#
+# descriptive.box_plot('AgeCategory')
+# descriptive.plot_a_and_b('BMI_Rounded')
+# descriptive.plot_a_and_b('AgeCategory')
+# descriptive.plot_distribution('AgeCategory')
+# descriptive.plot_a_and_b('PhysicalHealth')
+# descriptive.plot_a_given_b('PhysicalHealth')
 
 # phys_health_groups=descriptive.data.groupby(['PhysicalHealth'])
 # phys_health_probabilities = phys_health_groups['HeartDisease'].mean()
