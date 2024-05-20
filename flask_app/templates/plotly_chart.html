@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horizontal Bar Chart Example</title>
+    <!-- Include Chart.js -->
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js" charset="utf-8"></script>
+    <style>
+
+    </style>
+
+</head>
+<body>
+
+<div id="myChart"></div>
+
+<script>
+    let plotly_chart = {{chart|safe}}
+
+    Plotly.newPlot('myChart', plotly_chart.data, plotly_chart.layout)
+</script>
+</body>
+</html>

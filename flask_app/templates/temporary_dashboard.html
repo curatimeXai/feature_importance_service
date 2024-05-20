@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temporary Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/variables.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    <style>
+        .dashboard {
+            margin-bottom: 10%;
+        }
+
+        .bottom-inputs-bar {
+            position: fixed;
+            bottom: 0;
+            height: 10%;
+            width: 100%;
+            border-top: 2px solid var(--primary-color);
+        }
+
+        .chart-iframe {
+            min-height: 400px;
+        }
+
+        .scope-toggler {
+            border: 1px solid var(--primary-color);
+            border-radius: var(--border-radius);
+            display: flex;
+        }
+
+        .scope-toggler span {
+            width: 100%;
+            text-align: center;
+            background: hsla(0, 0%, 0%, 0);
+            color: var(--primary-color);
+            transition: 1s;
+            border-radius: var(--border-radius) 0 0 var(--border-radius);
+            border-right: 1px solid var(--primary-color);
+            cursor: pointer;
+        }
+
+        .scope-toggler span:last-child {
+            border-right: 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+
+        .scope-toggler .active {
+            background: var(--primary-color);
+            color: var(--bright-color);
+        }
+
+        .scope-toggler span:hover {
+            background: var(--primary-color);
+            color: var(--bright-color);
+        }
+
+        .iframe-wrapper {
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+<main class="flex col-12">
+    <div class="col-2 pr-2">
+        <div class="mt-2">
+            <div class="scope-toggler">
+                <span class="active">Global</span>
+                <span>Local</span>
+            </div>
+            <form id="sidebarForm">
+            </form>
+        </div>
+    </div>
+    <div id="dashboardView" class="row col-10">
+    </div>
+
+</main>
+</body>
+<script src="{{ url_for('static', filename='js/FormHelper.js') }}"></script>
+<script src="{{ url_for('static', filename='js/IframeBuilder.js') }}"></script>
+<script src="{{ url_for('static', filename='js/SidebarBuilder.js') }}"></script>
+<script src="{{ url_for('static', filename='js/DashboardBuilder.js') }}"></script>
+<script>
+    var columns = {{columns|safe}};
+    (function (columns) {
+        let formId = 'sidebarForm'
+        const dashboardBuilder = new DashboardBuilder('dashboardView', formId, columns)
+        dashboardBuilder.buildGlobalDashboard()
+        {#iframeBuilder.loadIframe('iframe1', url1)#}
+
+        const scopeToggler = document.querySelector('.scope-toggler')
+        scopeToggler.childNodes.forEach(span => {
+            span.addEventListener('click', (event) => {
+                if (event.target.classList.contains('active')) {
+                    return
+                }
+                scopeToggler.childNodes.forEach(spanWithoutClasses => {
+                    spanWithoutClasses.className = '';
+                });
+                event.target.className = 'active'
+                if (event.target.innerText === 'Global') {
+                    dashboardBuilder.buildGlobalForm()
+                    dashboardBuilder.buildGlobalDashboard()
+                    console.log('togggle scope global')
+                }
+                if (event.target.innerText === 'Local') {
+                    dashboardBuilder.buildLocalForm()
+                    dashboardBuilder.buildLocalDashboard()
+                    console.log('togggle scope local')
+                }
+            })
+        })
+    })(columns)
+</script>
+</html>

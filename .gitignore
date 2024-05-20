@@ -10,5 +10,5 @@
 /.idea/rGraphicsSettings.xml
 /.idea/rpackages.xml
 /.idea/rSettings.xml
-/src/explainers/
-/src/models/
+/flask_app/src/explainers/
+/flask_app/src/models/

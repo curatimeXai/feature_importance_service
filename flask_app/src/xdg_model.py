@@ -14,18 +14,22 @@ from sklearn.metrics import accuracy_score, log_loss
 
 
 class XdgHeartDiseaseClassifier:
-    def __init__(self, data_path, sample_size=200):
-        self.data = pd.read_csv(data_path)
-        self.X = self.data.drop(columns=['HeartDisease', self.data.columns[0]])
+    def __init__(self, data_path=None, data=None, sample_size=200):
+        if data_path is not None:
+            self.data = pd.read_csv(data_path)
+            self.data = self.data.drop(columns=[self.data.columns[0]])
+        if data is not None:
+            self.data = data
+        self.X = self.data.drop(columns=['HeartDisease'])
         self.y = self.data['HeartDisease']
         self.scaler = MinMaxScaler(feature_range=(0,1))
-        self.X_normalized = self.scaler.fit_transform(self.X.values)
+        self.X_normalized = self.scaler.fit_transform(self.X)
         self.X_train, self.X_temp, self.y_train, self.y_temp = train_test_split(self.X_normalized, self.y,
                                                                                 test_size=0.2, random_state=42)
         self.X_val, self.X_test, self.y_val, self.y_test = train_test_split(self.X_temp, self.y_temp, test_size=0.5,
                                                                             random_state=42)
         self.model = None
-        self.X_sample = shap.utils.sample(self.X.values, sample_size)
+        self.X_sample = shap.utils.sample(self.X, sample_size)
         self.explainer = None
         self.dalex_explainer = None
 

@@ -1,14 +1,14 @@
 import matplotlib.pyplot as plt
 
-from src.xdg_model import XdgHeartDiseaseClassifier
+from flask_app.src.xdg_model import XdgHeartDiseaseClassifier
 
 # Example usage:
 # model=SVC(kernel='poly')
-model_path= "/home/alex/UniProjects/BachelorXAI/src/models/xdg_model.pkl"
+model_path= "/flask_app/src/models/xdg_model2.pkl"
 # model_path=None
-explainer_path= "/home/alex/UniProjects/BachelorXAI/src/explainers/xdg_explainer.pkl"
+explainer_path= "/flask_app/src/explainers/xdg_explainer2.pkl"
 # explainer_path=None
-data_path= '/home/alex/UniProjects/BachelorXAI/datasets/dataset_2020_2022/2020/heart_2020_cleaned_numerical.csv'
+data_path= '/datasets/dataset_2020_2022/2020/heart_2020_cleaned_numerical.csv'
 do_train=True
 classifier = XdgHeartDiseaseClassifier(data_path,
                                        sample_size=100)
@@ -17,7 +17,8 @@ if do_train or not classifier.model_is_saved(model_path):
     accuracies = classifier.train()
     classifier.save_model(model_path)
     classifier.plot_accuracy(accuracies)
-    plt.show()
+    if len(accuracies) > 1:
+        plt.show()
 
 classifier.load_dalex_explainer(explainer_path=explainer_path)
 classifier.save_dalex_explainer(explainer_path)
