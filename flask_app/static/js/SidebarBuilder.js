@@ -4,18 +4,20 @@ class SidebarBuilder {
         this.siderbarForm = document.getElementById(sidebarId)
         this.sidebarSubmitButton = this.siderbarForm.querySelector('button');
         this.localFormButtons = `
+        <div class="row">
             <button id="randomizer" type="button">Randomize</button>
-            <button type="submit">Explain</button>`
+            <button type="submit">Explain</button>
+        </div>`
     }
 
-    buildInput(key, title) {
+    buildInput(key, title,tooltip='test') {
         let column = this.columns[key]
         if (column.type === 'boolean')
             this.buildCheckbox(key, title)
         if (column.type === 'category')
             this.buildSelect(column, key, title)
         if (column.type === 'numerical')
-            this.buildSlider(column, key, title)
+            this.buildSlider(column, key, title,tooltip)
 
     }
 
@@ -25,74 +27,50 @@ class SidebarBuilder {
         return inputWrapper
     }
 
-    buildLabel(title, labelFor = 'text') {
+    buildLabel(title, labelFor = 'text',tooltip) {
         let label = document.createElement('label')
         label.htmlFor = labelFor;
         let textDiv = document.createElement('div')
         let textNode = document.createTextNode(title);
         textDiv.append(textNode)
+        // textDiv.insertAdjacentHTML('beforeend', this.getTooltipTemplate(tooltip))
         label.append(textDiv)
         return label;
     }
 
     buildCheckbox(key, title, checked = false) {
-        let inputWrapper = this.buildInputWrapper()
-        let label = this.buildLabel(title, 'checkbox')
-        let input = document.createElement('input')
-        input.type = 'checkbox'
-        input.name = key
-        input.checked = checked
-        label.append(input)
-        label.className = 'flex'
-        inputWrapper.append(label)
-        this.siderbarForm.append(inputWrapper);
+        let inputWrapper = FormHelper.getInputWrapper(title, 'checkbox')
+        inputWrapper.label.classList.add('space-between')
+        let input = FormHelper.getCheckboxElement(key,checked,'col-6')
+        inputWrapper.label.append(input)
+        this.siderbarForm.append(inputWrapper.inputWrapper);
     }
 
-    buildSelect(column, key, title, selected = null) {
-        let inputWrapper = this.buildInputWrapper()
-        let label = this.buildLabel(title, 'select')
-        let selectElement = document.createElement('select')
-        selectElement.name = key;
-        const columnValuesEntries = Object.entries(column.values);
+    buildSelect(column, key, title, selected = null,tooltip='') {
+        let inputWrapperObj = FormHelper.getInputWrapper(title, 'select', 'col-6')
+           if (tooltip) {
+            inputWrapperObj.labelTitle.insertAdjacentHTML('beforeend', FormHelper.getTooltipTemplate(tooltip));
+        }
+        let selectElement = FormHelper.getSelectElement(key,column,selected,'col-6')
+        inputWrapperObj.label.append(selectElement)
+        this.siderbarForm.append(inputWrapperObj.inputWrapper);
+    }
 
-        columnValuesEntries.sort((a, b) => a[1] - b[1]);
-        columnValuesEntries.forEach(value => {
-            let option = document.createElement('option')
-            option.innerText = value[0]
-            if (selected === value[0])
-                option.selected = true;
+    buildSlider(column, key, title, tooltip = '') {
+        let inputWrapperObj = FormHelper.getInputWrapper(title, 'range')
+        if (tooltip)
+            inputWrapperObj.labelTitle.insertAdjacentHTML('beforeend', FormHelper.getTooltipTemplate(tooltip));
+        inputWrapperObj.label.append(FormHelper.getSliderElement(key, column.values[0], column.values[1]))
+        this.siderbarForm.append(inputWrapperObj.inputWrapper);
+    }
 
-            selectElement.append(option)
+    buildButtons(buttonsCollection) {
+        let buttonsWrapperObj = FormHelper.getButtonsWrapper()
+        buttonsCollection.forEach(buttonObj => {
+            buttonsWrapperObj.buttonsWrapper.append(this.buildButton(buttonObj.type, buttonObj.text, buttonObj.id))
         })
-        label.append(selectElement)
-        inputWrapper.append(label)
-        this.siderbarForm.append(inputWrapper);
+        return buttonsWrapperObj.buttonsWrapper;
     }
-
-    buildSlider(column, key, title) {
-        let inputWrapper = this.buildInputWrapper();
-        let label = this.buildLabel(title, 'range');
-        let rangeInput = document.createElement('input');
-        rangeInput.type = 'range';
-        rangeInput.name = key
-        rangeInput.min = column.values[0];
-        rangeInput.max = column.values[1];
-        rangeInput.step = 1;
-        let input = document.createElement('input')
-        input.type = 'number'
-        input.value = parseInt(rangeInput.value)
-        rangeInput.oninput = (ev) => {
-            input.value = parseInt(ev.target.value)
-        }
-        input.oninput = (ev) => {
-            rangeInput.value = parseInt(ev.target.value)
-        }
-        label.append(rangeInput);
-        label.append(input);
-        inputWrapper.append(label);
-        this.siderbarForm.append(inputWrapper);
-    }
-
     buildButton(type, text, id = null) {
         let btn = document.createElement('button')
         btn.type = type
@@ -102,5 +80,7 @@ class SidebarBuilder {
         this.siderbarForm.append(btn)
         return btn
     }
+
+
 
 }

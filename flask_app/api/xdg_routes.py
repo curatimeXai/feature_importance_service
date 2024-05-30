@@ -24,16 +24,16 @@ def get_vip():
 def get_breakdown():
     input_parameters=request.args.to_dict()
     result = xdg_break_down(input_parameters)
-    return render_template('plotly_chart.html', chart=result)
+    return result
 @xdg_blueprint.route('/shapley', methods=['GET'])
 def get_shapley():
     input_parameters = request.args.to_dict()
     result = xdg_shapley(input_parameters)
-    return render_template('plotly_chart.html', chart=result)
-@xdg_blueprint.route('/ceterisparabus', methods=['GET'])
-def get_ceterisparabus():
+    return result
+@xdg_blueprint.route('/ceterisparabus/<variable>/', methods=['GET'])
+def get_ceterisparabus(variable):
     input_parameters = request.args.to_dict()
-    result = xdg_ceteris_parabus(input_parameters)
+    result = xdg_ceteris_parabus(input_parameters,variable)
     return render_template('plotly_chart.html', chart=result)
 @xdg_blueprint.route('/modelperformance', methods=['GET'])
 def get_modelperformance():

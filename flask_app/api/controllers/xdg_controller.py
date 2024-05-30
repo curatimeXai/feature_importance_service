@@ -57,11 +57,13 @@ def xdg_break_down(input):
     classifier.load_model(MODEL_PATH)
     classifier.load_dalex_explainer(EXPLAINER_PATH)
     bd_normal = classifier.dalex_explainer.predict_parts(scaled_input, type='break_down')
+    bd_denormalized=classifier.denormalize_dalex_result(bd_normal)
     # bd_normal = classifier.dalex_explainer.predict_parts(classifier.X_test_denormalized.iloc[0], type='break_down', label=classifier.y_test_denormalized.iloc[0])
     # bd_interactions = classifier.dalex_explainer.predict_parts(classifier.X_test[0], type='break_down_interactions',
     #                                     label=classifier.y_test[0])
     # return bd_normal.plot(bd_interactions, show=False).to_json()
-    return bd_normal.plot(show=False).to_json()
+    return bd_denormalized.plot(show=False, vcolors=["#371ea3", "#f05a71", "#8bdcbe"]).to_json()
+
 
 def xdg_shapley(input):
     dataset_service=DatasetService()
@@ -72,9 +74,10 @@ def xdg_shapley(input):
     classifier.load_model(MODEL_PATH)
     classifier.load_dalex_explainer(EXPLAINER_PATH)
     shapl = classifier.dalex_explainer.predict_parts(scaled_input, type='shap', B=10)
-    return shapl.plot(show=False).to_json()
+    shapl_denormalized = classifier.denormalize_dalex_result(shapl)
+    return shapl_denormalized.plot(show=False, vcolors=["#371ea3","#f05a71","#8bdcbe"]).to_json()
 
-def xdg_ceteris_parabus(input):
+def xdg_ceteris_parabus(input,variable):
     dataset_service=DatasetService()
     classifier = XdgHeartDiseaseClassifier(data=dataset_service.data_2020, sample_size=100)
     inputDf = pd.DataFrame(columns=classifier.X.columns)
@@ -82,5 +85,6 @@ def xdg_ceteris_parabus(input):
     scaled_input = classifier.scaler.transform(inputDf)
     classifier.load_model(MODEL_PATH)
     classifier.load_dalex_explainer(EXPLAINER_PATH)
-    cp = classifier.dalex_explainer.predict_profile(scaled_input)
-    return cp.plot(show=False).to_json()
+    cp = classifier.dalex_explainer.predict_profile(scaled_input,variables=[variable])
+    cp_denormalized = classifier.denormalize_dalex_dataframe(cp,variable)
+    return cp_denormalized.plot(show=False).to_json()

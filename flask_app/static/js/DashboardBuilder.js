@@ -3,6 +3,7 @@ class DashboardBuilder {
         this.dashboardElement = document.getElementById(dashboardId)
         this.formId = formId
         this.sidebarBuilder = new SidebarBuilder(columns, 'sidebarForm')
+        this.localChartsUris = ['/xdg/breakdown', '/xdg/shapley']
         this.globalDashboard = null
         this.globalForm = null
         this.localDashboard = null
@@ -23,35 +24,24 @@ class DashboardBuilder {
         this.globalDashboard = this.dashboardElement.innerHTML
     }
 
-    buildLocalDashboard() {
-        this.buildLocalForm()
-        var url1 = 'http://127.0.0.1:5000/xdg/breakdown'
-        url1 = FormHelper.buildUrlWithFormInputs(url1, this.formId)
-        var url2 = 'http://127.0.0.1:5000/xdg/shapley'
-        url2 = FormHelper.buildUrlWithFormInputs(url2, this.formId)
-        var url3 = 'http://127.0.0.1:5000/xdg/ceterisparabus'
-        url3 = FormHelper.buildUrlWithFormInputs(url3, this.formId)
-        const iframeBuilder = new IframeBuilder()
-        this.dashboardElement.innerHTML = ''
-        iframeBuilder.buildIframe('iframe1', url1, this.dashboardElement)
-        iframeBuilder.buildIframe('iframe2', url2, this.dashboardElement)
-        iframeBuilder.buildIframe('iframe3', url3, this.dashboardElement)
-        this.localDashboard = this.dashboardElement.innerHTML
-
-    }
 
     buildGlobalForm() {
         this.localForm = this.sidebarBuilder.siderbarForm.innerHTML;
         this.sidebarBuilder.siderbarForm.innerHTML = ''
     }
 
+    buildLocalDashboard() {
+        this.buildLocalForm()
+        this.buildLocalCharts()
+    }
+
     buildLocalForm() {
         this.globalForm = this.sidebarBuilder.siderbarForm.innerHTML;
         this.sidebarBuilder.siderbarForm.innerHTML = ''
-        this.sidebarBuilder.buildInput('BMI', 'Body Mass Index')
-        this.sidebarBuilder.buildInput('PhysicalHealth', 'For how many days during the past 30 days was your physical health not good?')
-        this.sidebarBuilder.buildInput('MentalHealth', 'For how many days during the past 30 days was your mental health not good?')
-        this.sidebarBuilder.buildInput('SleepTime', 'Sleep Time')
+        this.sidebarBuilder.buildInput('BMI', 'Body Mass Index', 'Body Mass Index is an important measurement for checking whether someone is probably obese. (> 26)')
+        this.sidebarBuilder.buildInput('PhysicalHealth', 'Physical Health', 'For how many days during the past 30 days was the physical health good?')
+        this.sidebarBuilder.buildInput('MentalHealth', 'Mental Health', 'For how many days during the past 30 days was the physical health good?')
+        this.sidebarBuilder.buildInput('SleepTime', 'Sleep Time', 'Amount of sleep time can have an significant effect on the probability of having heart disease.')
         this.sidebarBuilder.buildInput('AgeCategory', 'Age Category')
         this.sidebarBuilder.buildInput('Sex', 'Sex')
         this.sidebarBuilder.buildInput('Race', 'Race')
@@ -65,14 +55,37 @@ class DashboardBuilder {
         this.sidebarBuilder.buildInput('Asthma', 'Has Asthma')
         this.sidebarBuilder.buildInput('KidneyDisease', 'Has Kidney Disease')
         this.sidebarBuilder.buildInput('SkinCancer', 'Has Skin Cancer')
-        let randomizer=this.sidebarBuilder.buildButton('button', 'Randomize', 'randomizer')
+        let buttonsWrapper=this.sidebarBuilder.buildButtons([
+            {
+                type: 'button',
+                text: 'Randomize',
+                id: 'randomizer',
+            },
+            {
+                 type: 'submit',
+                text: 'Explain',
+            }
+        ])
+        this.sidebarBuilder.siderbarForm.append(buttonsWrapper)
+        let randomizer = document.getElementById('randomizer')
         randomizer.onclick = () => {
             FormHelper.randomizeFormInputs(this.formId)
         }
-        this.sidebarBuilder.buildButton('submit', 'Explain', 'randomizer')
         document.getElementById(this.formId).addEventListener('submit', event => {
             event.preventDefault()
-            this.buildLocalForm()
+            this.buildLocalCharts()
         })
+    }
+
+    buildLocalCharts() {
+        this.dashboardElement.innerHTML = ''
+        let chartBuilder = new ChartBuilder()
+        let params = FormHelper.getFormValues(this.formId);
+        chartBuilder.loadChart('chart0',
+            this.dashboardElement,
+            Http.get('/xdg/breakdown', params));
+        chartBuilder.loadChart('chart1',
+            this.dashboardElement,
+            Http.get('/xdg/shapley', params));
     }
 }

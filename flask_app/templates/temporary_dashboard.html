@@ -6,6 +6,9 @@
     <title>Temporary Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/variables.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+          integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
     <style>
         .dashboard {
             margin-bottom: 10%;
@@ -27,6 +30,7 @@
             border: 1px solid var(--primary-color);
             border-radius: var(--border-radius);
             display: flex;
+            align-items: center;
         }
 
         .scope-toggler span {
@@ -35,11 +39,14 @@
             background: hsla(0, 0%, 0%, 0);
             color: var(--primary-color);
             transition: 1s;
-            border-radius: var(--border-radius) 0 0 var(--border-radius);
             border-right: 1px solid var(--primary-color);
             cursor: pointer;
         }
 
+        .scope-toggler span:first-child {
+            border-radius: var(--border-radius) 0 0 var(--border-radius);
+
+        }
         .scope-toggler span:last-child {
             border-right: 0;
             border-radius: 0 var(--border-radius) var(--border-radius) 0;
@@ -59,14 +66,20 @@
             position: relative;
         }
     </style>
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js" charset="utf-8"></script>
+
 </head>
 <body>
-<main class="flex col-12">
+<main class="flex col-12 mt-1">
+
     <div class="col-2 pr-2">
-        <div class="mt-2">
-            <div class="scope-toggler">
-                <span class="active">Global</span>
-                <span>Local</span>
+        <div>
+            <div class="scope-toggler mb-1">
+                <span class="active" data-toggle-name="local">Local</span>
+                <span data-toggle-name="global">Global</span>
+                <span data-toggle-name="settings">
+                    <i class="fa fa-cog"></i>
+                </span>
             </div>
             <form id="sidebarForm">
             </form>
@@ -77,20 +90,21 @@
 
 </main>
 </body>
+<script src="{{ url_for('static', filename='js/Loader.js') }}"></script>
+<script src="{{ url_for('static', filename='js/ChartBuilder.js') }}"></script>
+<script src="{{ url_for('static', filename='js/Http.js') }}"></script>
 <script src="{{ url_for('static', filename='js/FormHelper.js') }}"></script>
 <script src="{{ url_for('static', filename='js/IframeBuilder.js') }}"></script>
 <script src="{{ url_for('static', filename='js/SidebarBuilder.js') }}"></script>
 <script src="{{ url_for('static', filename='js/DashboardBuilder.js') }}"></script>
+
 <script>
-    var columns = {{columns|safe}};
     (function (columns) {
         let formId = 'sidebarForm'
         const dashboardBuilder = new DashboardBuilder('dashboardView', formId, columns)
-        dashboardBuilder.buildGlobalDashboard()
-        {#iframeBuilder.loadIframe('iframe1', url1)#}
-
+        dashboardBuilder.buildLocalDashboard()
         const scopeToggler = document.querySelector('.scope-toggler')
-        scopeToggler.childNodes.forEach(span => {
+        scopeToggler.querySelectorAll('span').forEach(span => {
             span.addEventListener('click', (event) => {
                 if (event.target.classList.contains('active')) {
                     return
@@ -99,18 +113,21 @@
                     spanWithoutClasses.className = '';
                 });
                 event.target.className = 'active'
-                if (event.target.innerText === 'Global') {
-                    dashboardBuilder.buildGlobalForm()
-                    dashboardBuilder.buildGlobalDashboard()
-                    console.log('togggle scope global')
-                }
-                if (event.target.innerText === 'Local') {
+                if (event.target.getAttribute('data-toggle-name') === 'local') {
                     dashboardBuilder.buildLocalForm()
                     dashboardBuilder.buildLocalDashboard()
                     console.log('togggle scope local')
                 }
+                if (event.target.getAttribute('data-toggle-name') === 'global') {
+                    dashboardBuilder.buildGlobalForm()
+                    dashboardBuilder.buildGlobalDashboard()
+                    console.log('togggle scope global')
+                }
+                if (event.target.getAttribute('data-toggle-name') === 'settings') {
+                    console.log('togggle settings')
+                }
             })
         })
-    })(columns)
+    })({{columns|safe}}, Plotly)
 </script>
 </html>

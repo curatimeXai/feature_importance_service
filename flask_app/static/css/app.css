@@ -6,19 +6,60 @@
     display: flex;
     flex-wrap: wrap;
 }
+
+.space-between {
+    justify-content: space-between;
+}
+
+.flex-end {
+    justify-content: flex-end;
+}
+
+.v-align-center {
+    align-items: center;
+}
+
+.mt-05 {
+    margin-top: 5px;
+}
+
+.mt-1 {
+    margin-top: 10px;
+}
+
 .mt-2 {
     margin-top: 20px;
 }
+
+.mr-1 {
+    margin-right: 10px;
+}
+
+.mb-05 {
+    margin-bottom: 5px;
+}
+
+.mb-1 {
+    margin-bottom: 10px;
+}
+
+.mb-2 {
+    margin-bottom: 20px;
+}
+
+
 .mr-2 {
     margin-right: 20px;
 }
-.pr-2{
+
+.pr-2 {
     padding-right: 20px;
 }
 
 .col-1 {
     width: 8.33%;
 }
+
 .col-2 {
     width: 16.66%;
 }
@@ -26,21 +67,27 @@
 .col-3 {
     width: 25%;
 }
+
 .col-4 {
     width: 33.33%;
 }
+
 .col-5 {
     width: 41.66%;
 }
+
 .col-6 {
     width: 50%;
 }
+
 .col-7 {
-    width: 50%;
+    width: 58.33%;
 }
+
 .col-8 {
-    width: 50%;
+    width: 66.66%;
 }
+
 .col-9 {
     width: 75%;
 }
@@ -88,7 +135,35 @@
     }
 }
 
+.tooltip-container {
+    position: relative;
+    display: block;
+}
+
+.tooltip-text {
+    visibility: hidden;
+    width: 250px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 5px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    left: 450%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip-container:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+
 /*Inputs CSS*/
+
 input[type="text"] {
     appearance: none;
     border: none;
@@ -188,7 +263,6 @@ input[type="color"]::-webkit-color-swatch-wrapper {
 input[type="range"] {
     appearance: none;
     background: transparent;
-    width: 8em;
 }
 
 input[type="range"]::-webkit-slider-thumb {
@@ -308,13 +382,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 input[type="number"] {
-    width: 3em;
-    padding: 0.5em;
+    padding: 0.5em 0 0.5em 0.5em;
     border: 0.2em solid var(--primary-color);
     border-radius: 1em;
     text-align: center;
     color: var(--primary-color);
-    margin: 0;
 }
 
 input[type="number"]::-webkit-inner-spin-button {
@@ -336,10 +408,6 @@ select:hover,
 select:focus {
     background: var(--primary-color);
     color: var(--bright-color);
-}
-
-label select{
-    width: 100%;
 }
 
 body {
