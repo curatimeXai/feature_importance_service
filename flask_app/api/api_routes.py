@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 
-from flask_app.api.controllers import dataset_controller
+from api.controllers import dataset_controller
 
 api_blueprint = Blueprint('api', __name__,url_prefix='api')
 

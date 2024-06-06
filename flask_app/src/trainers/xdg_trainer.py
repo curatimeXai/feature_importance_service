@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-from flask_app.src.xdg_model import XdgHeartDiseaseClassifier
+from src.xdg_model import XdgHeartDiseaseClassifier
 
 # Example usage:
 # model=SVC(kernel='poly')

@@ -1,3 +1,5 @@
+import math
+
 import pandas as pd
 
 
@@ -9,19 +11,19 @@ class DatasetService:
             '/home/alex/UniProjects/BachelorXAI/datasets/dataset_2020_2022/2022/heart_2022_no_nans_numerical.csv'
         ]
         self.data_2020 = pd.read_csv(self.datasets_paths[1])
-        self.data_2020=self.data_2020.drop(columns=[self.data_2020.columns[0]])
-        self.columns_2020={
-            'HeartDisease': {'type': 'boolean', 'values': {'No': 0, 'Yes': 1}},
+        self.data_2020 = self.data_2020.drop(columns=[self.data_2020.columns[0]])
+        self.columns_2020 = {
+            'HeartDisease': {'title': 'Heart Disease', 'type': 'boolean', 'values': {'No': 0, 'Yes': 1}},
             'Smoking': {'type': 'boolean', 'values': {'No': 0, 'Yes': 1}},
-            'AlcoholDrinking': {'type': 'boolean', 'values': {'No': 0, 'Yes': 1}},
-            'Stroke': {'type': 'boolean', 'values': {'No': 0, 'Yes': 1}},
-            'DiffWalking': {'type': 'boolean', 'values': {'No': 0, 'Yes': 1}},
-            'PhysicalActivity': {'type': 'boolean', 'values': {'No': 0, 'Yes': 1}},
-            'Asthma': {'type': 'boolean', 'values': {'No': 0, 'Yes': 1}},
-            'KidneyDisease': {'type': 'boolean', 'values': {'No': 0, 'Yes': 1}},
-            'SkinCancer': {'type': 'boolean', 'values': {'No': 0, 'Yes': 1}},
+            'AlcoholDrinking': {'title': 'Drinking alcohol', 'type': 'boolean', 'values': {'No': 0, 'Yes': 1}},
+            'Stroke': {'title': 'Had Stroke', 'type': 'boolean', 'values': {'No': 0, 'Yes': 1}},
+            'DiffWalking': {'title': 'Has Difficulties Walking', 'type': 'boolean', 'values': {'No': 0, 'Yes': 1}},
+            'PhysicalActivity': {'title': 'Has Physical Activity', 'type': 'boolean', 'values': {'No': 0, 'Yes': 1}},
+            'Asthma': {'title': 'Has Asthma', 'type': 'boolean', 'values': {'No': 0, 'Yes': 1}},
+            'KidneyDisease': {'title': 'Has Kidney Disease', 'type': 'boolean', 'values': {'No': 0, 'Yes': 1}},
+            'SkinCancer': {'title': 'Has Skin Cancer', 'type': 'boolean', 'values': {'No': 0, 'Yes': 1}},
             'Sex': {'type': 'category', 'values': {'Male': 1, 'Female': 2}},
-            'AgeCategory': {'type': 'category', 'values': {
+            'AgeCategory': {'title': 'Age Category', 'type': 'category', 'values': {
                 "18-24": 1,
                 "25-29": 2,
                 "30-34": 3,
@@ -50,7 +52,7 @@ class DatasetService:
                 "Yes (during pregnancy)": 3,
                 "No, borderline diabetes": 4,
             }},
-            'GenHealth': {'type': 'category', 'values': {
+            'GenHealth': {'title': 'General Health', 'type': 'category', 'values': {
                 "Poor": 1,
                 "Fair": 2,
                 "Good": 3,
@@ -58,11 +60,13 @@ class DatasetService:
                 "Excellent": 5,
             }},
             'BMI': {'type': 'numerical', 'values': [self.data_2020['BMI'].min(), self.data_2020['BMI'].max()]},
-            'PhysicalHealth': {'type': 'numerical',
-                               'values': [self.data_2020['PhysicalHealth'].min(), self.data_2020['PhysicalHealth'].max()]},
-            'MentalHealth': {'type': 'numerical',
+            'PhysicalHealth': {'title': 'Physical Health', 'type': 'numerical', 'invertValue': True,
+                               'values': [self.data_2020['PhysicalHealth'].min(),
+                                          self.data_2020['PhysicalHealth'].max()]},
+            'MentalHealth': {'title': 'Mental Health', 'type': 'numerical', 'invertValue': True,
                              'values': [self.data_2020['MentalHealth'].min(), self.data_2020['MentalHealth'].max()]},
-            'SleepTime': {'type': 'numerical', 'values': [self.data_2020['SleepTime'].min(), self.data_2020['SleepTime'].max()]},
+            'SleepTime': {'title': 'Sleep Time', 'type': 'numerical',
+                          'values': [self.data_2020['SleepTime'].min(), self.data_2020['SleepTime'].max()]},
         }
 
     def transform_2020_input(self, input):
@@ -74,6 +78,9 @@ class DatasetService:
             if self.columns_2020[col]['type'] == 'category':
                 transformed_input.append(self.columns_2020[col]['values'][input[col]])
             if self.columns_2020[col]['type'] == 'numerical':
-                transformed_input.append(float(input[col]))
+                if self.columns_2020[col].get('invertValue', False):
+                    transformed_input.append(abs(float(input[col]) - self.columns_2020[col]['values'][1]))
+                else:
+                    transformed_input.append(float(input[col]))
 
         return transformed_input

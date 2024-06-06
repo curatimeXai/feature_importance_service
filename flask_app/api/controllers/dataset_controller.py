@@ -1,4 +1,4 @@
-from flask_app.src.dataset_service import DatasetService
+from src.dataset_service import DatasetService
 
 def get_2020_dataset_columns():
     dataset_service=DatasetService()

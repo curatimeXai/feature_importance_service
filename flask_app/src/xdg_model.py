@@ -142,18 +142,30 @@ class XdgHeartDiseaseClassifier:
                         parsed_val = self.get_first_key_by_value(dataset_service.columns_2020[var_name]['values'],
                                                                parsed_val)
 
-                    result_tpl[j, 2] = f'{var_name} = {parsed_val}'
+                    if dataset_service.columns_2020[var_name].get('invertValue',False):
+                        parsed_val = abs(parsed_val - dataset_service.columns_2020[col]['values'][1])
+
+                    readable_varname=dataset_service.columns_2020[var_name]['title'] if 'title' in  dataset_service.columns_2020[var_name] else var_name
+                    result_tpl[j, 2] = f'{readable_varname} = {parsed_val}'
 
         dalex_result.result['variable'] = result_tpl[:, 2]
         return dalex_result
 
     def denormalize_dalex_dataframe(self, dalex_result,variable):
+        dataset_service=DatasetService()
         filtered_df=dalex_result.result[self.X.columns]
         denormalized=self.scaler.inverse_transform(filtered_df)
         dalex_result.result[self.X.columns]=denormalized
         filtered_df[variable]=dalex_result.result['_original_']
-        denormalized_original=self.scaler.inverse_transform(filtered_df)
-        dalex_result.result['_original_']=denormalized_original[:,self.X.columns.get_loc(variable)]
+        denormalized_original = self.scaler.inverse_transform(filtered_df)
+        dalex_result.result['_original_'] = denormalized_original[:, self.X.columns.get_loc(variable)]
+        readable_varnames = []
+        for varname in dalex_result.result['variable']:
+            readable_varnames.append(
+                dataset_service.columns_2020[varname]['title'] if 'title' in dataset_service.columns_2020[
+                    varname] else varname)
+
+        dalex_result.result['variable'] = readable_varnames
         return dalex_result
 
     def get_first_key_by_value(self, d, target_value):

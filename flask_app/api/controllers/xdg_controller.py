@@ -1,10 +1,11 @@
 import base64
 
+import numpy as np
 import pandas as pd
 import plotly.io as pio
 
-from flask_app.src.dataset_service import DatasetService
-from flask_app.src.xdg_model import XdgHeartDiseaseClassifier
+from src.dataset_service import DatasetService
+from src.xdg_model import XdgHeartDiseaseClassifier
 
 DATA_PATH = '/home/alex/UniProjects/BachelorXAI/datasets/dataset_2020_2022/2020/heart_2020_cleaned_numerical.csv'
 MODEL_PATH = "/home/alex/UniProjects/BachelorXAI/flask_app/src/models/xdg_model.pkl"
@@ -63,6 +64,24 @@ def xdg_break_down(input):
     #                                     label=classifier.y_test[0])
     # return bd_normal.plot(bd_interactions, show=False).to_json()
     return bd_denormalized.plot(show=False, vcolors=["#371ea3", "#f05a71", "#8bdcbe"]).to_json()
+
+
+def xdg_overview(input):
+    dataset_service=DatasetService()
+    classifier = XdgHeartDiseaseClassifier(data=dataset_service.data_2020, sample_size=100)
+    inputDf = pd.DataFrame(columns=classifier.X.columns)
+    inputDf.loc[len(inputDf.index)] = dataset_service.transform_2020_input(input)
+    scaled_input = classifier.scaler.transform(inputDf)
+    classifier.load_model(MODEL_PATH)
+    classifier.load_dalex_explainer(EXPLAINER_PATH)
+    bd_normal = classifier.dalex_explainer.predict_parts(scaled_input, type='break_down')
+    bd_denormalized = classifier.denormalize_dalex_result(bd_normal)
+    overview = np.array([bd_denormalized.result['variable'], bd_denormalized.result['contribution']]).T
+    filtered_overview = overview[overview[:, 0] != 'intercept']
+    prediction= filtered_overview[filtered_overview[:, 0] == 'prediction']
+    features= filtered_overview[filtered_overview[:, 0] != 'prediction']
+    sorted_features = features[features[:, 1].argsort()]
+    return {'prediction': prediction[0,1], 'features': sorted_features.tolist()}
 
 
 def xdg_shapley(input):
