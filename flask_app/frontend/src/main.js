@@ -1,14 +1,21 @@
-import './assets/app.css'
+import './assets/css/app.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
 import {useDashboardStore} from "@/stores/dashboard.js";
 import mitt from 'mitt';
+import {createMemoryHistory, createRouter} from "vue-router";
+import {routes} from "@/routes.js";
+
 const emitter = mitt();
 
+const router = createRouter({
+  history: createMemoryHistory(),
+  routes,
+})
 const app = createApp(App)
-
+app.use(router)
 app.use(createPinia())
 app.config.globalProperties.emitter = emitter;
 app.mount('#app')

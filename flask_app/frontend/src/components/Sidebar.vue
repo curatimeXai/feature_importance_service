@@ -10,7 +10,7 @@ const dashboardStore = useDashboardStore();
 </script>
 
 <template>
-  <div class="col-2 pr-2" style="position: fixed;">
+  <div class="col-2 capsule" style="position: fixed; top: 10px;">
     <div>
       <ScopeToggler></ScopeToggler>
       <LocalSidebar v-if="dashboardStore.view==='local'"></LocalSidebar>

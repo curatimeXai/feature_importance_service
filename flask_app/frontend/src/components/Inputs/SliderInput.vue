@@ -6,16 +6,16 @@ const props = defineProps({
   max: Number,
   name: String
 })
-const rangeValue = ref(Math.floor(props.max / 2))
-const inputValue = ref(Math.floor(props.max / 2))
+const rangeValue = ref(Math.floor(props.max / 2)+Math.floor(props.min))
+const inputValue = ref(Math.floor(props.max / 2)+Math.floor(props.min))
 
 </script>
 
 <template>
   <div class="row col-3">
-    <input v-model="rangeValue" @input="inputValue=rangeValue" class="col-12" type="range" step="1" :name="name" :min="min"
-           :max="max">
-    <input v-model="inputValue" @input="rangeValue=inputValue" class="mt-05 col-12" type="number" :min="parseInt(min)"
+    <input v-model="inputValue" @input="rangeValue=parseInt(inputValue)" class="mb-05 col-12" type="number" :min="parseInt(min)"
+           :max="parseInt(max)">
+    <input v-model="rangeValue" @input="inputValue=parseInt(rangeValue)" class="col-12" type="range" step="1" :name="name" :min="parseInt(min)"
            :max="parseInt(max)">
   </div>
 </template>

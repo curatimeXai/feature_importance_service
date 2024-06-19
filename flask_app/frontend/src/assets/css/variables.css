@@ -6,5 +6,7 @@
     --positive-color: #8bdcbe;
     --negative-color: #f05a71;
     --middle-color: #371ea3;
+    --warning-color: #EFBD3F;
+    --default-padding: 10px;
     --border-radius: 1em;
 }

@@ -81,7 +81,7 @@ heart_data$KidneyDisease <- convert_to_boolean(heart_data$KidneyDisease)
 heart_data$SkinCancer <- convert_to_boolean(heart_data$SkinCancer)
 
 print("heart data prep done")
-write.csv(heart_data, "/home/alex/UniProjects/BachelorXAI/datasets/dataset_2020_2022/2020/heart_2020_cleaned_numerical.csv", row.names = TRUE)
+write.csv(heart_data, "/datasets/dataset_2020_2022/2020/heart_2020_cleaned_numerical_old.csv", row.names = TRUE)
 
 # model_svm <- svm(HeartDisease ~ ., data = heart_data, probability = TRUE)
 # print(names(heart_data))

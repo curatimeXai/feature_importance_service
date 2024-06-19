@@ -15,6 +15,10 @@ const props = defineProps({
     type: String,
     default: 'var(--middle-color)'
   },
+  suffix: {
+    type: String,
+    default: ''
+  },
   parserFunctionName: {
     type: String | null,
     default: 'parseNumeric'
@@ -26,35 +30,35 @@ const subtitle = ref(props.subtitleProp)
 const icon = ref(props.iconProp)
 const color = ref(props.colorProp)
 
-const lang = navigator.language;
+const lang = 'en-EN';
 
 const parsers = {
   parseNumeric: () => {
     let parsed = parseFloat(subtitle.value)
-    let localParsed = parsed.toLocaleString(lang, {minimumFractionDigits: 2, maximumFractionDigits: 4});
+    let localParsed = parsed.toLocaleString(lang, {minimumFractionDigits: 0, maximumFractionDigits: 2});
     if (parsed > 0) {
       subtitle.value = '+' + localParsed;
       color.value = 'var(--positive-color)'
-      icon.value = 'fa fa-plus'
+      icon.value = 'fa fa-thumbs-up'
     }
     if (parsed < 0) {
       subtitle.value = localParsed;
       color.value = 'var(--negative-color)'
-      icon.value = 'fa fa-circle-minus'
+      icon.value = 'fa fa-thumbs-down'
     }
   },
   parseInverseNumeric: () => {
     let parsed = parseFloat(subtitle.value)
-    let localParsed = parsed.toLocaleString(lang, {minimumFractionDigits: 2, maximumFractionDigits: 4});
+    let localParsed = parsed.toLocaleString(lang, {minimumFractionDigits: 0, maximumFractionDigits: 2});
     if (parsed < 0) {
       subtitle.value = localParsed
       color.value = 'var(--positive-color)'
-      icon.value = 'fa fa-circle-minus'
+      icon.value = 'fa fa-thumbs-up'
     }
     if (parsed > 0) {
       subtitle.value = '+' + localParsed;
       color.value = 'var(--negative-color)'
-      icon.value = 'fa fa-plus'
+      icon.value = 'fa fa-thumbs-down'
     }
   }
 
@@ -71,8 +75,8 @@ onMounted(() => {
 
 <template>
   <div class="badge" :style="`border: 1px solid ${color};`">
-    <h3>{{ title }}</h3>
-    <div :style="`color: ${color};`">{{ subtitle }}</div>
+    <h4>{{ title }}</h4>
+    <div style="color: #371ea3;">{{ subtitle + suffix }}</div>
     <div style="font-size: 30px;" :style="`color: ${color};`">
       <i :class="icon"></i>
     </div>

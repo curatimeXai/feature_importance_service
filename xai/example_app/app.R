@@ -7,7 +7,7 @@ library("shinyWidgets")
 library("DALEX")
 library("ggplot2")
 
-# Additional models libraries used
+# Additional trained_models libraries used
 library(stats)
 library(ranger)
 

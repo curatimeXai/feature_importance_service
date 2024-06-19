@@ -14,7 +14,7 @@ function hide() {
 </script>
 
 <template>
-  <div ref="loader" class="loader-background" style="display: block; height: 400px;">
+  <div ref="loader" class="loader-background mb-1" style="display: block; height: 400px;">
     <div class="loader">
       <svg height="200" width="200">
         <circle id="circle" cx="100" cy="100" r="50" stroke="#C1002A" stroke-width="5" fill="transparent"></circle>

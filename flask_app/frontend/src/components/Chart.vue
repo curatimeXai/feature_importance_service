@@ -1,27 +1,68 @@
 <script setup>
 import Plotly from 'plotly.js-dist'
-import {ref, defineProps, onMounted} from 'vue'
+import {ref, defineProps, onMounted, watch} from 'vue'
 import Loader from "@/components/Loader.vue";
+import {useDashboardStore} from "@/stores/dashboard.js";
 
 const props = defineProps({
-  chartId: String,
+  chartData: {
+    type: Object,
+    default: {data: [], layout: []},
+  }
 });
 
+const dashboardStore = useDashboardStore();
+const chartData = ref(props.chartData);
+const chartId = dashboardStore.getChartId()
+const chartBuild = ref(false);
 const loading = ref(true)
 
-function load(promise) {
-  document.getElementById(props.chartId).innerHTML = ''
+function startLoading() {
   loading.value = true
+}
+
+function stopLoading() {
+  loading.value = false
+}
+
+function setChartData(data) {
+  chartData.value = data
+}
+
+function buildChart() {
+  if (document.getElementById(chartId)) {
+    Plotly.newPlot(chartId, chartData.value.data, chartData.value.layout).then(() => {
+      stopLoading();
+    })
+  }
+}
+
+function load(promise) {
+  document.getElementById(chartId).innerHTML = ''
+  startLoading()
   promise.then(async (response) => {
-    const chartData = await response.json()
-    Plotly.newPlot(props.chartId, chartData.data, chartData.layout)
-  }).finally(() => {
-    loading.value = false;
+    chartData.value = await response.json()
   })
 }
 
 defineExpose({
-  load
+  startLoading,
+  stopLoading,
+  setChartData,
+  buildChart,
+  load,
+})
+
+onMounted(()=>{
+  if (chartBuild.value!==true&&chartData.value.data.length>0) {
+    buildChart()
+  }
+})
+
+watch(() => chartData.value, (newValue) => {
+  if (newValue.data.length > 0) {
+    buildChart()
+  }
 })
 
 </script>
@@ -29,7 +70,7 @@ defineExpose({
 <template>
   <div>
     <Loader v-if="loading"></Loader>
-    <div :id="props.chartId" class="chart-wrapper">
+    <div :id="chartId">
     </div>
   </div>
 </template>

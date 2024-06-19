@@ -13,20 +13,21 @@ const emitter = useEmitter();
 const chartsRef = ref([])
 const modules = [
   {
-    chartUrl: '/xdg/breakdown',
-    explanation: 'The chart shows a vertical line representing the final model prediction.\n' +
-        'The X-axis represents the model\'s prediction value.\n' +
-        'The Y-axis lists the variables (features) used by the model.\n' +
-        'Colored bars on the chart represent the contribution of each variable to the final prediction.\n' +
-        'Green bars indicate the reduction of the probability of having heart disease.\n' +
-        'Red bars indicate the increase of the probability of having heart disease.\n' +
-        'The size of the bar reflects the impact of the variable. '
+    chartUrl: `/${dashboardStore.model}/breakdown`,
+    title: 'Break Down Chart',
+    explanations: [
+      'The intercept stands for the mean probability of having heart disease across the whole dataset.',
+      'The horizontal bars show the contribution of each risk factor.',
+      'Positive contribution increases the risk factor and negative contribution decreases it.'
+    ]
   }, {
-    chartUrl: '/xdg/shapley',
-    explanation: 'A DALEX Shapley chart is a bar chart that visualizes this feature contribution. \n' +
-        'Each bar represents a feature in the model\'s data.\n' +
-        'The size of the bar shows the impact of that feature on the prediction. Positive values mean the feature pushed the prediction in a certain direction, while negative values indicate the opposite.\n' +
-        'Green bars indicate good contribution to the heart disease prediction, and red bars represent bad contributions.'
+    chartUrl: `/${dashboardStore.model}/shapley`,
+    title: 'Shapley Chart',
+    explanations: [
+      "This chart helps you compare each risk factor and see it's contribution, given the current input.",
+      'The intercept stands for the mean probability of having heart disease across the whole dataset.',
+      'The horizontal bars show the contribution of each risk factor.',
+      'Positive contribution increases the risk factor and negative contribution decreases it.']
   },
 ]
 
@@ -40,11 +41,19 @@ emitter.on('submitSidebar', () => {
 </script>
 
 <template>
-  <div id="dashboardView" class="row">
+  <div id="dashboardView">
     <LocalOverview></LocalOverview>
     <template v-for="(module,idx) in modules">
-      <Chart ref="chartsRef" class="col-8" :chart-id="'chart'+idx"></Chart>
-      <div class="col-4">{{module.explanation}}</div>
+      <div class="flex g-1">
+        <Chart ref="chartsRef" class="col-8"></Chart>
+        <div class="col-4">
+          <h4>{{ module.title }}</h4>
+          <ul>
+            <li v-for="explanation in module.explanations">{{ explanation }}</li>
+          </ul>
+          {{ module.explanation }}
+        </div>
+      </div>
     </template>
   </div>
 </template>

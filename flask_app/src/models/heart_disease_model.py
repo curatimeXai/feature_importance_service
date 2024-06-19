@@ -8,47 +8,62 @@ import numpy as np
 import pandas as pd
 import shap
 import xgboost
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, log_loss
 
-from src.dataset_service import DatasetService
+from src.services.dataset_service import DatasetService
 
 
-class XdgHeartDiseaseClassifier:
-    def __init__(self, data_path=None, data=None, sample_size=200):
+class HeartDiseaseClassifier:
+    def __init__(self, data_path=None, data=None, data_sample=0, stratify=False, model=None, ):
         if data_path is not None:
             self.data = pd.read_csv(data_path)
             self.data = self.data.drop(columns=[self.data.columns[0]])
+            self.data = self.data.drop(columns=['Race'])
         if data is not None:
             self.data = data
+
+        if stratify == True:
+            true_df = self.data[self.data['HeartDisease'] == 1]
+            false_df = self.data[self.data['HeartDisease'] == 0].sample(true_df.shape[0], random_state=42)
+            self.data = pd.concat([true_df, false_df])
+
+        if data_sample > 0:
+            self.data = self.data.sample(n=data_sample, random_state=42)
+
         self.X = self.data.drop(columns=['HeartDisease'])
         self.y = self.data['HeartDisease']
         self.scaler = MinMaxScaler(feature_range=(0, 1))
         self.X_normalized = self.scaler.fit_transform(self.X)
+        self.X_normalized = pd.DataFrame(self.X_normalized, columns=self.X.columns)
         self.X_train, self.X_temp, self.y_train, self.y_temp = train_test_split(self.X_normalized, self.y,
                                                                                 test_size=0.2, random_state=42)
         self.X_val, self.X_test, self.y_val, self.y_test = train_test_split(self.X_temp, self.y_temp, test_size=0.5,
                                                                             random_state=42)
-        self.model = None
-        self.X_sample = shap.utils.sample(self.X, sample_size)
+        self.model = model
         self.explainer = None
         self.dalex_explainer = None
 
-    def train(self, epochs=1, increments=-1):
+    def train(self, X=None, y=None, epochs=1, batch_size=32, increments=-1, is_dnn=False, callbacks=None):
         accuracies = []
+        train_data = self.X_train if X is None else X
+        target_data = self.y_train if y is None else y
+        if is_dnn:
+            history = self.model.fit(train_data, target_data, epochs=epochs, batch_size=batch_size,
+                                        callbacks=callbacks)
+            return history.history['accuracy']
         for i in range(epochs):
             if increments == -1:
-                self.model.fit(self.X_train, self.y_train)
+                self.model.fit(train_data, target_data)
                 accuracies.append(accuracy_score(self.y_val, self.model.predict(self.X_val)))
                 continue
 
-            for j in range(0, len(self.X_train), increments):
-                end_index = min(j + increments, len(self.X_train))
-                X_batch = self.X_train[j:end_index]
-                y_batch = self.y_train[j:end_index]
+            for j in range(0, len(train_data), increments):
+                end_index = min(j + increments, len(train_data))
+                X_batch = train_data[j:end_index]
+                y_batch = target_data[j:end_index]
                 self.model.fit(X_batch, y_batch)
                 if j % increments == 0:
                     y_pred_val = self.model.predict(self.X_val)
@@ -69,11 +84,9 @@ class XdgHeartDiseaseClassifier:
     def plot_accuracy(self, accuracies):
         plt.plot(range(len(accuracies)), accuracies)
 
-    def load_model(self, model_path=None, model=SVC(kernel='poly')):
+    def load_model(self, model_path=None):
         if model_path is not None and os.path.exists(model_path):
             self.model = joblib.load(model_path)
-        else:
-            self.model = xgboost.XGBClassifier()
 
     def model_is_saved(self, model_path):
         return os.path.exists(model_path)
@@ -84,12 +97,15 @@ class XdgHeartDiseaseClassifier:
         else:
             self.explainer = shap.Explainer(self.model.predict, self.X_sample)
 
-    def load_dalex_explainer(self, explainer_path=None):
+    def load_dalex_explainer(self, explainer_path=None,X=None,y=None):
         if explainer_path is not None and os.path.exists(explainer_path):
             with open(explainer_path, 'rb') as fd:
                 self.dalex_explainer = dalex.Explainer.load(fd)
         else:
-            self.dalex_explainer = dalex.Explainer(self.model, self.X_train, self.y_train)
+            # explainer_data = pd.DataFrame(self.X_normalized, columns=self.X.columns) if X is None else X
+            explainer_data = self.X_normalized if X is None else X
+            explainer_targets = self.y if y is None else y
+            self.dalex_explainer = dalex.Explainer(self.model, explainer_data, explainer_targets)
 
     def shap_analysis(self, sample_ind=20):
         shap_values = self.explainer(self.X_test[:100])
@@ -110,22 +126,22 @@ class XdgHeartDiseaseClassifier:
 
         shap.plots.beeswarm(shap_values)
 
-    def save_model(self, filename="models/example_model.pkl"):
+    def save_model(self, filename="trained_models/example_model.pkl"):
         joblib.dump(self.model, filename)
 
-    def save_explainer(self, filename="models/example_explainer.pkl"):
+    def save_explainer(self, filename="trained_models/example_explainer.pkl"):
         joblib.dump(self.explainer, filename)
 
-    def save_dalex_explainer(self, filename="models/example_explainer.pkl"):
+    def save_dalex_explainer(self, filename="trained_models/example_explainer.pkl"):
         with open(filename, 'wb') as fd:
             self.dalex_explainer.dump(fd)
 
     def denormalize_dalex_result(self, dalex_result):
-        dataset_service=DatasetService()
+        dataset_service = DatasetService()
         result_tpl = np.array([dalex_result.result['variable_name'], dalex_result.result['variable_value'],
                                dalex_result.result['variable']]).T
         temp_result = pd.DataFrame(columns=self.X.columns)
-        old_result = [0]*len(self.X.columns)
+        old_result = [0] * len(self.X.columns)
         for i, col in enumerate(self.X.columns):
             for var_name, var_value, variable in result_tpl:
                 if col == var_name:
@@ -138,35 +154,59 @@ class XdgHeartDiseaseClassifier:
             for j, (var_name, var_value, variable) in enumerate(result_tpl):
                 if col == var_name:
                     parsed_val = math.floor(new_variable_values[0][i])
-                    if dataset_service.columns_2020[var_name]['type'] in ['boolean','category']:
-                        parsed_val = self.get_first_key_by_value(dataset_service.columns_2020[var_name]['values'],
-                                                               parsed_val)
+                    if dataset_service.kaggle_heart_disease_2020_columns[var_name]['type'] in ['boolean', 'category']:
+                        parsed_val = self.get_first_key_by_value(dataset_service.kaggle_heart_disease_2020_columns[var_name]['values'],
+                                                                 parsed_val)
 
-                    if dataset_service.columns_2020[var_name].get('invertValue',False):
-                        parsed_val = abs(parsed_val - dataset_service.columns_2020[col]['values'][1])
-
-                    readable_varname=dataset_service.columns_2020[var_name]['title'] if 'title' in  dataset_service.columns_2020[var_name] else var_name
+                    readable_varname = dataset_service.kaggle_heart_disease_2020_columns[var_name]['title'] if 'title' in \
+                                                                                                               dataset_service.kaggle_heart_disease_2020_columns[
+                                                                                              var_name] else var_name
                     result_tpl[j, 2] = f'{readable_varname} = {parsed_val}'
 
         dalex_result.result['variable'] = result_tpl[:, 2]
         return dalex_result
 
-    def denormalize_dalex_dataframe(self, dalex_result,variable):
-        dataset_service=DatasetService()
-        filtered_df=dalex_result.result[self.X.columns]
-        denormalized=self.scaler.inverse_transform(filtered_df)
-        dalex_result.result[self.X.columns]=denormalized
-        filtered_df[variable]=dalex_result.result['_original_']
+    def denormalize_dalex_dataframe(self, dalex_result, variable):
+        dataset_service = DatasetService()
+        filtered_df = dalex_result.result[self.X.columns]
+        denormalized = self.scaler.inverse_transform(filtered_df)
+        dalex_result.result[self.X.columns] = denormalized
+        filtered_df[variable] = dalex_result.result['_original_']
         denormalized_original = self.scaler.inverse_transform(filtered_df)
         dalex_result.result['_original_'] = denormalized_original[:, self.X.columns.get_loc(variable)]
         readable_varnames = []
         for varname in dalex_result.result['variable']:
             readable_varnames.append(
-                dataset_service.columns_2020[varname]['title'] if 'title' in dataset_service.columns_2020[
+                dataset_service.kaggle_heart_disease_2020_columns[varname]['title'] if 'title' in dataset_service.kaggle_heart_disease_2020_columns[
                     varname] else varname)
 
         dalex_result.result['variable'] = readable_varnames
         return dalex_result
+
+    def denormalize_x_y(self, dalex_result, variable):
+        temp_result = pd.DataFrame(columns=self.X.columns)
+
+        result_row = [0] * len(self.X.columns)
+        for val in dalex_result.result['_x_']:
+            result_row[self.X.columns.get_loc(variable)] = val
+            temp_result.loc[len(temp_result.index)] = result_row
+
+        denormalized_original = self.scaler.inverse_transform(temp_result)
+        dalex_result.result['_x_'] = denormalized_original[:, self.X.columns.get_loc(variable)]
+        dalex_result.result['_yhat_'] = dalex_result.result['_yhat_'].apply(lambda x: x * 100)
+        return dalex_result
+
+    def rename_variables(self, dalex_result):
+        dataset_service = DatasetService()
+        readable_varnames = []
+        for varname in dalex_result.result['variable']:
+            if varname in dataset_service.kaggle_heart_disease_2020_columns and 'title' in dataset_service.kaggle_heart_disease_2020_columns[varname]:
+                readable_varnames.append(dataset_service.kaggle_heart_disease_2020_columns[varname]['title'])
+            else:
+                readable_varnames.append(varname)
+        dalex_result.result['variable'] = readable_varnames
+        return dalex_result
+
 
     def get_first_key_by_value(self, d, target_value):
         for key, value in d.items():

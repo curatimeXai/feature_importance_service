@@ -9,11 +9,11 @@ import Loader from "@/components/Loader.vue";
 const dashboardStore = useDashboardStore();
 const emitter = useEmitter();
 
-const badgesRef = ref([])
 const overviewData = ref(null)
 
 emitter.on('submitSidebar', () => {
-  Http.get('/xdg/overview', dashboardStore.sidebarFormData).then(async response => {
+  overviewData.value=null
+  Http.get(`/${dashboardStore.model}/overview`, dashboardStore.sidebarFormData).then(async response => {
     overviewData.value = await response.json();
   })
 })
@@ -22,21 +22,22 @@ emitter.on('submitSidebar', () => {
 </script>
 
 <template>
-  <div class="col-8" style="gap: 10px;">
+  <div class="col-12 row" style="gap: 10px;">
     <Loader v-if="overviewData===null"></Loader>
     <template v-else>
-      <div class="flex justify-center mb-1">
-        <OverviewBadge :title-prop="'Prediction'"
-                       :subtitle-prop="overviewData['prediction']"
-                       :parser-function-name="'parseNumeric'">
-        </OverviewBadge>
-      </div>
       <div class="row space-between" style="gap: 10px;">
+        <OverviewBadge :title-prop="'Prediction'"
+                       :subtitle-prop="(overviewData['prediction']).toLocaleString('en-EN', {minimumFractionDigits: 0, maximumFractionDigits: 2})"
+                       :suffix="'%'" :parser-function-name="null"
+                       :icon-prop="overviewData['prediction']<30?'fa fa-thumbs-up':'fa fa-thumbs-down'"
+                       :color-prop="overviewData['prediction']<30?'var(--positive-color)':'var(--negative-color)'">
+        </OverviewBadge>
         <OverviewBadge v-for="badgeData in overviewData['features']"
                        :title-prop="badgeData[0]"
                        :subtitle-prop="badgeData[1]"
-                       style="flex-grow: 1;"
-                       :parser-function-name="'parseInverseNumeric'">
+                       :suffix="'%'"
+                       :parser-function-name="'parseInverseNumeric'"
+                       style="flex-grow: 1;">
         </OverviewBadge>
       </div>
     </template>

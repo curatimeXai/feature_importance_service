@@ -1,22 +1,14 @@
 <script setup>
-import LocalDashboard from "@/components/Local/LocalDashboard.vue";
-import Sidebar from "@/components/Sidebar.vue";
-import GlobalDashboard from "@/components/Global/GlobalDashboard.vue";
-import SettingsView from "@/components/Settings/SettingsView.vue";
-import {useDashboardStore} from "@/stores/dashboard.js";
-const dashboardStore=useDashboardStore()
+import TutorialBubble from "@/components/TutorialBubble.vue";
+import {useRoute} from "vue-router";
+
+const route = useRoute();
 </script>
 
 <template>
   <main class="flex col-12 mt-1">
-    <Sidebar></Sidebar>
-    <div class="col-10" style="margin-left: 18%">
-      <LocalDashboard v-if="dashboardStore.view==='local'"></LocalDashboard>
-      <GlobalDashboard v-if="dashboardStore.view==='global'"></GlobalDashboard>
-      <SettingsView v-if="dashboardStore.view==='settings'"></SettingsView>
-    </div>
-
-
+    <RouterView></RouterView>
+    <TutorialBubble v-if="route.path!=='/tutorial'"></TutorialBubble>
   </main>
 </template>
 

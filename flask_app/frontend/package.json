@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "build:dev": "vite build --emptyOutDir --mode=development",
+    "watch": "vite build --emptyOutDir --mode=development --watch",
     "build": "vite build --emptyOutDir",
     "preview": "vite preview"
   },
@@ -12,7 +14,8 @@
     "mitt": "^3.0.1",
     "pinia": "^2.1.7",
     "plotly.js-dist": "^2.33.0",
-    "vue": "^3.4.21"
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.3"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",

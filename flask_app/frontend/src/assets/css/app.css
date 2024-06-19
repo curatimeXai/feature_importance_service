@@ -1,12 +1,20 @@
-@import './variables.css';
+@import 'variables.css';
 
 .flex {
     display: flex;
 }
 
+.block {
+    display: block;
+}
+
 .row {
     display: flex;
     flex-wrap: wrap;
+}
+
+.g-1 {
+    gap: 10px;
 }
 
 .space-between {
@@ -60,6 +68,10 @@
 
 .pr-2 {
     padding-right: 20px;
+}
+
+.p-1{
+    padding: 10px;
 }
 
 .col-1 {
@@ -132,6 +144,11 @@
     min-height: 400px;
 }
 
+.container {
+    padding-left: 15%;
+    padding-right: 15%;
+}
+
 .scope-toggler {
     border: 1px solid var(--primary-color);
     border-radius: var(--border-radius);
@@ -139,7 +156,7 @@
     align-items: center;
 }
 
-.scope-toggler span {
+.scope-toggler a {
     width: 100%;
     text-align: center;
     background: hsla(0, 0%, 0%, 0);
@@ -147,19 +164,20 @@
     transition: 1s;
     border-right: 1px solid var(--primary-color);
     cursor: pointer;
+    text-decoration: none;
 }
 
-.scope-toggler span:first-child {
+.scope-toggler a:first-child {
     border-radius: var(--border-radius) 0 0 var(--border-radius);
 
 }
 
-.scope-toggler span:last-child {
+.scope-toggler a:last-child {
     border-right: 0;
     border-radius: 0 var(--border-radius) var(--border-radius) 0;
 }
 
-.scope-toggler .active {
+.scope-toggler .router-link-active, .router-link-active {
     background: var(--primary-color);
     color: var(--bright-color);
 }
@@ -167,6 +185,11 @@
 .scope-toggler span:hover {
     background: var(--primary-color);
     color: var(--bright-color);
+}
+
+.disabled {
+  pointer-events: none;
+  cursor: default;
 }
 
 .iframe-wrapper {
@@ -181,6 +204,7 @@
     height: 100%;
     z-index: 1;
     justify-content: center;
+    border-radius: var(--border-radius);
 }
 
 .loader {
@@ -189,6 +213,12 @@
     justify-content: center;
     height: 100%;
     align-items: center;
+}
+
+.capsule {
+    background: var(--bright-color);
+    padding: var(--default-padding);
+    border-radius: var(--border-radius);
 }
 
 #circle {
@@ -481,5 +511,6 @@ select:focus {
 
 body {
     font-family: 'Noto Sans', serif;
-    font-size: 13pt;
+    font-size: 12pt;
+    background: var(--primary-color);
 }

@@ -1,6 +1,6 @@
 library("DALEX")
 library("e1071")  # for SVM
-heart_csv <- "/home/alex/UniProjects/BachelorXAI/datasets/dataset_2020_2022/2020/heart_2020_cleaned_numerical.csv"
+heart_csv <- "/datasets/dataset_2020_2022/2020/heart_2020_cleaned_numerical_old.csv"
 heart_data <- read.csv(heart_csv)
 heart_data <- heart_data[1:10000,]
 heart_data<- heart_data[,-1]

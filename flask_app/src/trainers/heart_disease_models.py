@@ -98,7 +98,7 @@ y = main_dataset['target'].values.reshape(-1,1)
 
 X_train, X_test, y_train, y_test = train_test_split(X,y, test_size = 0.2, random_state=40)
 
-#models
+#trained_models
 '''
 SVC with Diff C and diff kernel
 KNeighbors range(2,20) p=1 & p=2

@@ -10,9 +10,11 @@ const store = useDashboardStore();
 
 const inputs = ref([
   {
-    key: 'BMI',
-    title: 'Body Mass Index',
-    tooltip: 'Body Mass Index is an important measurement for checking whether someone is probably obese. (> 26)'
+    key: 'weight',
+    title: 'Weight',
+  },{
+    key: 'height',
+    title: 'Height',
   }, {
     key: 'PhysicalHealth',
     title: 'Physical Health',
@@ -32,9 +34,9 @@ const inputs = ref([
     key: 'Sex',
     title: 'Sex Health',
   }, {
-    key: 'Race',
-    title: 'Race',
-  }, {
+  //   key: 'Race',
+  //   title: 'Race',
+  // }, {
     key: 'Diabetic',
     title: 'Diabetic',
   }, {
@@ -87,7 +89,7 @@ function randomize() {
         input.selectedIndex = Math.floor(Math.random() * optionsNr);
       }
       if (input.type === 'range') {
-        let randVal = parseInt(Math.random() * (input.max - input.min) + input.min)
+        let randVal = parseInt(Math.random() * (parseInt(input.max) - parseInt(input.min)) + parseInt(input.min))
         let numberInput = input.parentElement.querySelector('input[type="number"]')
         input.value = randVal;
         numberInput.value = randVal
@@ -98,14 +100,6 @@ function randomize() {
     }
   })
 }
-
-//
-// onMounted(() => {
-//   if (sidebarForm.value) {
-//     setFormData();
-//   }
-// });
-
 
 watch(() => sidebarForm.value, (newValue) => {
   if (newValue) {
@@ -118,8 +112,25 @@ watch(() => sidebarForm.value, (newValue) => {
   <div v-if="store.datasetColumns">
     <form ref="sidebarForm" @submit.prevent="setFormData($event)">
       <div>
+        <div class="input-group mb-1">
+            <label class="row col-12">
+              <span class="flex v-align-center space-between col-9">
+                {{ 'Weight (kg)' }}
+                <Tooltip :tooltip-text="'Weight and height are used to calculate BMI. People are considered overweight for BMI > 26'"></Tooltip>
+              </span>
+              <SliderInput :name="'weight'" :min="50" :max="200"></SliderInput>
+            </label>
+          </div>
+        <div class="input-group mb-1">
+            <label class="row col-12">
+              <span class="flex v-align-center space-between col-9">
+                {{ 'Height (cm)' }}
+              </span>
+              <SliderInput :name="'height'" :min="100" :max="220"></SliderInput>
+            </label>
+          </div>
         <template v-for="inputDef in inputs">
-          <div v-if="store.datasetColumns[inputDef.key]['type']==='numerical'" class="input-group mb-1">
+          <div v-if="store.datasetColumns[inputDef.key]&&store.datasetColumns[inputDef.key]['type']==='numerical'" class="input-group mb-1">
             <label class="row col-12" for="${label_for}">
               <span class="flex v-align-center space-between col-9">
                 {{ inputDef.title }}
@@ -129,33 +140,31 @@ watch(() => sidebarForm.value, (newValue) => {
                            :max="store.datasetColumns[inputDef.key]['values'][1]"></SliderInput>
             </label>
           </div>
-          <div v-if="store.datasetColumns[inputDef.key]['type']==='category'" class="input-group mb-1">
+          <div v-if="store.datasetColumns[inputDef.key]&&store.datasetColumns[inputDef.key]['type']==='category'" class="input-group mb-1">
             <label class="row col-12 space-between" for="${label_for}">
               <span class="flex v-align-center col-6">
                  {{ inputDef.title }}
                 <Tooltip v-if="inputDef.tooltip" :tooltip-text="inputDef.tooltip"></Tooltip>
               </span>
-              <Tooltip v-if="inputDef.tooltip" :tooltip-text="inputDef.tooltip"></Tooltip>
-              <select class="col-6" :name="inputDef.key">
+              <select class="col-6" :name="inputDef.key" >
                 <option v-for="(key,value) in store.datasetColumns[inputDef.key]['values']">{{ value }}</option>
               </select>
             </label>
           </div>
-          <div v-if="store.datasetColumns[inputDef.key]['type']==='boolean'" class="input-group mb-1">
+          <div v-if="store.datasetColumns[inputDef.key]&&store.datasetColumns[inputDef.key]['type']==='boolean'" class="input-group mb-1">
             <label class="row col-12 space-between" for="'checkbox">
-              <span class="flex v-align-center col-6">
+              <span class="flex v-align-center col-9">
                  {{ inputDef.title }}
                 <Tooltip v-if="inputDef.tooltip" :tooltip-text="inputDef.tooltip"></Tooltip>
               </span>
-              <Tooltip v-if="inputDef.tooltip" :tooltip-text="inputDef.tooltip"></Tooltip>
-              <input type="checkbox" :name="inputDef.key" class="col-6">
+              <input type="checkbox" :name="inputDef.key" class="col-3">
             </label>
           </div>
         </template>
       </div>
-      <div class="row">
-        <button id="randomizer" type="button" @click="randomize">Randomize</button>
-        <button type="submit">Explain</button>
+      <div class="flex" style="gap: 10px">
+        <button id="randomizer" type="button" @click="randomize" class="col-6">Randomize</button>
+        <button type="submit" class="col-6">Explain</button>
       </div>
     </form>
   </div>
