@@ -56,7 +56,7 @@ import ScopeToggler from "@/components/ScopeToggler.vue";
               The risk factors are listed from strongest positive risk factors to the worse ones.
             </p>
           </div>
-<!--          todo: give example-->
+          <!--          todo: give example-->
           <img class="col-6" src="../assets/images/local_dashboard_overview_bad.png" alt="Me as an old person">
         </div>
         <div class="flex g-1 mb-1">
@@ -68,10 +68,10 @@ import ScopeToggler from "@/components/ScopeToggler.vue";
             <p>In this example, because of General Health, Age Category, Sleep Time and Physical Health the probability
               increases to over 50%.</p>
             <p>However, because of the other factors, the probability also decreases.</p>
-            <p><i class="fa fa-circle-exclamation" style="color: var(--warning-color);"></i> All probability values in
+            <p><i class="fa fa-triangle-exclamation" style="color: var(--warning-color);"></i> All probability values in
               charts are written in mathematical writing. This means that <b>10% is 0.1</b>.</p>
           </div>
-<!--          todo: Explain some bars-->
+          <!--          todo: Explain some bars-->
           <img class="col-8" src="../assets/images/local_dashboard_break_down_chart.png" alt="Me as an old person">
         </div>
         <div class="flex g-1 mb-1">
@@ -81,18 +81,50 @@ import ScopeToggler from "@/components/ScopeToggler.vue";
               This chart is rather relevant for comparing the influence of certain risk factors.
             </p>
           </div>
-<!--          todo: why is there a difference between breakdown and shapley in terms of contribution-->
-<!--          todo: give examples-->
+          <!--          todo: why is there a difference between breakdown and shapley in terms of contribution-->
+          <!--          todo: give examples-->
           <img class="col-8" src="../assets/images/local_dashboard_shapley_chart.png" alt="Me as an old person">
         </div>
       </div>
       <div>
         <h2>Step 3</h2>
-        <p>Check infos about the model and dataset in the global scope</p>
-      </div>
-      <div>
-        <h2>Optional Step</h2>
-        <p>Try other models out.</p>
+        <div class="flex g-1 mb-1">
+          <div>
+            <h4>Dataset Charts</h4>
+            <p>
+              These Charts serve as an small overview over the current dataset
+            </p>
+          </div>
+          <div class="col-8">
+            <img class="col-12" src="../assets/images/global_boolean_columns_percentage.png" alt="Me as an old person">
+            <img class="col-12" src="../assets/images/global_categorical_charts.png" alt="Me as an old person">
+            <img class="col-12" src="../assets/images/global_numerical_boxplots.png" alt="Me as an old person">
+          </div>
+        </div>
+        <div class="flex g-1 mb-1">
+          <div>
+            <h4>Model Charts</h4>
+            <p>
+              These Charts serve as an small overview over the current dataset
+            </p>
+          </div>
+          <div class="col-8">
+            <img class="col-12" src="../assets/images/global_variable_importance.png" alt="Me as an old person">
+            <img class="col-12" src="../assets/images/global_partial_dependency_chart.png" alt="Me as an old person">
+          </div>
+        </div>
+        <div>
+          <h2>Optional Step</h2>
+          <div class="flex g-1 mb-1">
+            <div>
+              <h4>Settings</h4>
+              <p>
+                You can change the predicting model, the dataset and view frequent questions
+              </p>
+            </div>
+            <img class="col-8" src="../assets/images/settings_view.png" alt="Me as an old person">
+          </div>
+        </div>
       </div>
     </div>
   </div>

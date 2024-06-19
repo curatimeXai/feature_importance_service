@@ -13,7 +13,7 @@ function onSwitchLineChart(event) {
   <div>
     <label class="row col-12 space-between" for="${label_for}">
       <span class="flex v-align-center col-6">
-       Aggregated Profiles
+       Probability by Value:
       </span>
       <select @change="onSwitchLineChart($event)" class="col-6">
         <option>BMI</option>

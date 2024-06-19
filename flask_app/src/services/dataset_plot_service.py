@@ -71,6 +71,48 @@ class DatasetPlotService:
         )
         return fig
 
+    def bar_charts(self, df, columns, col_count=4, title="Bar Charts"):
+        rows = math.ceil(len(columns) / col_count)
+        fig = make_subplots(rows=rows, cols=col_count)
+        for i, column in enumerate(columns):
+            color = self.colors[i % len(self.colors)]
+            value_counts = df[column].value_counts().sort_index()
+            map = dict(
+                (v, k) for k, v in self.dataset_service.kaggle_heart_disease_2020_columns[column]['values'].items())
+            value_counts.index = value_counts.index.map(map)
+
+            subfig = go.Figure(data=[
+                go.Bar(x=value_counts.index, y=value_counts,
+                       name=self.dataset_service.kaggle_heart_disease_2020_columns[column].get('title',
+                                                                                               column),
+                       marker=dict(color=color)),
+                go.Bar(x=value_counts.index, y=value_counts,
+                       name=self.dataset_service.kaggle_heart_disease_2020_columns[column].get('title',
+                                                                                               column),
+                       marker=dict(color=color))
+            ])
+            subfig.update_layout(barmode='stack')
+
+            fig.add_trace(
+                go.Bar(x=value_counts.index, y=value_counts,
+                       name=self.dataset_service.kaggle_heart_disease_2020_columns[column].get('title',
+                                                                                               column),
+                       marker=dict(color=color)),
+                row=math.floor(i / col_count) + 1,
+                col=i % col_count + 1)
+        fig.update_layout(
+            title_text=title,
+            font=dict(color='#371ea3'),
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1
+            )
+        )
+        return fig
+
     def plot_a_and_b(self, col):
         unique_vals = self.data[col].unique()
         unique_vals.sort()
