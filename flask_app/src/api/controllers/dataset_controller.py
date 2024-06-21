@@ -10,7 +10,7 @@ from src.services.dataset_service import DatasetService
 
 def get_2020_dataset_columns():
     dataset_service = DatasetService()
-    return dataset_service.kaggle_heart_disease_2020_columns
+    return dataset_service.convert_int64_to_int(dataset_service.kaggle_heart_disease_2020_columns)
 
 
 def get_all_boxplots(dataset):

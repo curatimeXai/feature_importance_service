@@ -4,21 +4,23 @@ import numpy as np
 import pandas as pd
 import plotly.io as pio
 
+from src.helpers import get_explainers_path, get_trained_models_path
 from src.models.heart_disease_model import HeartDiseaseClassifier
 from src.services.dataset_service import DatasetService
 
-DATA_PATH = '/home/alex/UniProjects/BachelorXAI/datasets/dataset_2020_2022/2020/heart_2020_cleaned_numerical.csv'
-MODEL_PATH = "/home/alex/UniProjects/BachelorXAI/flask_app/src/store/trained_models/rand_forest_model2.pkl"
-EXPLAINER_PATH = "/home/alex/UniProjects/BachelorXAI/flask_app/src/store/explainers/rand_forest_explainer2.pkl"
+
+MODEL_PATH = get_trained_models_path("rand_forest_model2.pkl")
+EXPLAINER_PATH = get_explainers_path("rand_forest_explainer2.pkl")
 
 def rand_forest_accuracy():
-    classifier = HeartDiseaseClassifier(DATA_PATH,
-                                    )
+    dataset_service=DatasetService()
+    classifier = HeartDiseaseClassifier(data=dataset_service.kaggle_heart_disease_2020)
     classifier.load_model(MODEL_PATH)
     return classifier.test_accuracy()
 
 def rand_forest_variable_importance_image():
-    classifier = HeartDiseaseClassifier(DATA_PATH)
+    dataset_service=DatasetService()
+    classifier = HeartDiseaseClassifier(data=dataset_service.kaggle_heart_disease_2020)
     classifier.load_model(MODEL_PATH)
     classifier.load_dalex_explainer(EXPLAINER_PATH)
     vi = classifier.dalex_explainer.model_parts()
@@ -28,7 +30,8 @@ def rand_forest_variable_importance_image():
     return 'data:image/png;base64,'+plot_url
 
 def rand_forest_variable_importance():
-    classifier = HeartDiseaseClassifier(DATA_PATH)
+    dataset_service=DatasetService()
+    classifier = HeartDiseaseClassifier(data=dataset_service.kaggle_heart_disease_2020)
     classifier.load_model(MODEL_PATH)
     classifier.load_dalex_explainer(EXPLAINER_PATH)
     vi = classifier.dalex_explainer.model_parts()
@@ -36,13 +39,15 @@ def rand_forest_variable_importance():
     return renamed_variables_vi.plot(show=False, title="Risk Factor Importance",max_vars=16).to_json()
 
 def rand_forest_model_performance():
-    classifier = HeartDiseaseClassifier(DATA_PATH)
+    dataset_service=DatasetService()
+    classifier = HeartDiseaseClassifier(data=dataset_service.kaggle_heart_disease_2020)
     classifier.load_model(MODEL_PATH)
     classifier.load_dalex_explainer(EXPLAINER_PATH)
     mp = classifier.dalex_explainer.model_performance(model_type='classification')
     return mp.plot(geom="roc",show=False).to_json()
 def rand_forest_pdp(variable):
-    classifier = HeartDiseaseClassifier(DATA_PATH)
+    dataset_service=DatasetService()
+    classifier = HeartDiseaseClassifier(data=dataset_service.kaggle_heart_disease_2020)
     classifier.load_model(MODEL_PATH)
     classifier.load_dalex_explainer(EXPLAINER_PATH)
     pdp_num = classifier.dalex_explainer.model_profile(type='partial', label="pdp",variables=[variable])

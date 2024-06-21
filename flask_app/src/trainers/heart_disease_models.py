@@ -21,7 +21,7 @@ from sklearn.preprocessing import MinMaxScaler
 import shap
 import sklearn
 
-main_dataset = pd.read_csv('../../../datasets/dataset_old/heart.csv')
+main_dataset = pd.read_csv('../../datasets/dataset_old/heart.csv')
 main_dataset = pd.DataFrame(main_dataset)
 
 print(main_dataset.shape)

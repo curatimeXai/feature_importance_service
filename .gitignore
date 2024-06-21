@@ -1,5 +1,5 @@
 
-/datasets/
+/flask_app/datasets/
 /.idea/.gitignore
 /.idea/Bachelor.iml
 /.idea/misc.xml
@@ -24,3 +24,5 @@
 /flask_app/src/store/explainers/xdg_explainer_stratified.pkl
 /flask_app/src/store/trained_models/
 /flask_app/templates/assets/
+/flask_app/.env
+/flask_app/src/store/

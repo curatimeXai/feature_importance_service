@@ -1,6 +1,6 @@
 export default class Http {
 
-    static baseUrl = 'http://127.0.0.1:5000'
+    static baseUrl = `${window.location.protocol}//${window.location.host}`
 
     static addParamsToGet(url, params = {}) {
         const urlWithParams = new URL(Http.baseUrl + url);
