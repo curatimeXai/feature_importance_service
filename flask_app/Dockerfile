@@ -32,5 +32,5 @@ EXPOSE 5000
 CMD if [ "$ENVIRONMENT" = "development" ]; then \
         gunicorn 'app:app' --bind=0.0.0.0:5000 --reload; \
     else \
-        gunicorn 'app:app' --bind=0.0.0.0:5000; \
+        gunicorn 'app:app' --bind=0.0.0.0:5000 --timeout 180; \
     fi
