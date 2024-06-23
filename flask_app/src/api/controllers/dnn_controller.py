@@ -69,7 +69,7 @@ def dnn_break_down(input):
     classifier.load_model(MODEL_PATH)
     classifier.load_dalex_explainer(EXPLAINER_PATH)
     bd_normal = classifier.dalex_explainer.predict_parts(scaled_input, N=500, type='break_down')
-    bd_denormalized = classifier.denormalize_dalex_result(bd_normal)
+    bd_denormalized = classifier.denormalize_bd_result(bd_normal)
     # bd_normal = classifier.dalex_explainer.predict_parts(classifier.X_test_denormalized.iloc[0], type='break_down', label=classifier.y_test_denormalized.iloc[0])
     # bd_interactions = classifier.dalex_explainer.predict_parts(classifier.X_test[0], type='break_down_interactions',
     #                                     label=classifier.y_test[0])
@@ -86,7 +86,7 @@ def dnn_overview(input):
     classifier.load_model(MODEL_PATH)
     classifier.load_dalex_explainer(EXPLAINER_PATH)
     bd_normal = classifier.dalex_explainer.predict_parts(scaled_input, N=500, type='break_down')
-    bd_denormalized = classifier.denormalize_dalex_result(bd_normal)
+    bd_denormalized = classifier.denormalize_bd_result(bd_normal)
     bd_denormalized.result['contribution'] = bd_denormalized.result['contribution'].apply(lambda x: x * 100)
     overview = np.array([bd_denormalized.result['variable'], bd_denormalized.result['contribution']]).T
     filtered_overview = overview[overview[:, 0] != 'intercept']
@@ -105,7 +105,7 @@ def dnn_shapley(input):
     classifier.load_model(MODEL_PATH)
     classifier.load_dalex_explainer(EXPLAINER_PATH)
     shapl = classifier.dalex_explainer.predict_parts(scaled_input, N=500, type='shap', B=10)
-    shapl_denormalized = classifier.denormalize_dalex_result(shapl)
+    shapl_denormalized = classifier.denormalize_shapley(shapl)
     return shapl_denormalized.plot(show=False, vcolors=["#371ea3", "#f05a71", "#8bdcbe"]).to_json()
 
 

@@ -1,5 +1,8 @@
+import functools
+import inspect
 import math
 import os
+import time
 
 import dalex
 import joblib
@@ -18,6 +21,7 @@ from src.services.dataset_service import DatasetService
 
 class HeartDiseaseClassifier:
     def __init__(self, data_path=None, data=None, data_sample=0, stratify=False, model=None, ):
+        start = time.time()
         if data_path is not None:
             self.data = pd.read_csv(data_path)
             self.data = self.data.drop(columns=[self.data.columns[0]])
@@ -45,6 +49,8 @@ class HeartDiseaseClassifier:
         self.model = model
         self.explainer = None
         self.dalex_explainer = None
+        end = time.time()
+        print(f"HeartDiseaseClassifier __init__ time: {end - start}")
 
     def train(self, X=None, y=None, epochs=1, batch_size=32, increments=-1, is_dnn=False, callbacks=None):
         accuracies = []
@@ -52,7 +58,7 @@ class HeartDiseaseClassifier:
         target_data = self.y_train if y is None else y
         if is_dnn:
             history = self.model.fit(train_data, target_data, epochs=epochs, batch_size=batch_size,
-                                        callbacks=callbacks)
+                                     callbacks=callbacks)
             return history.history['accuracy']
         for i in range(epochs):
             if increments == -1:
@@ -85,8 +91,12 @@ class HeartDiseaseClassifier:
         plt.plot(range(len(accuracies)), accuracies)
 
     def load_model(self, model_path=None):
+        start = time.time()
         if model_path is not None and os.path.exists(model_path):
             self.model = joblib.load(model_path)
+
+        end = time.time()
+        print(f"{inspect.stack()[0][3]} time: {end - start}")
 
     def model_is_saved(self, model_path):
         return os.path.exists(model_path)
@@ -97,7 +107,9 @@ class HeartDiseaseClassifier:
         else:
             self.explainer = shap.Explainer(self.model.predict, self.X_sample)
 
-    def load_dalex_explainer(self, explainer_path=None,X=None,y=None):
+    @functools.cache
+    def load_dalex_explainer(self, explainer_path=None, X=None, y=None):
+        start = time.time()
         if explainer_path is not None and os.path.exists(explainer_path):
             with open(explainer_path, 'rb') as fd:
                 self.dalex_explainer = dalex.Explainer.load(fd)
@@ -106,6 +118,9 @@ class HeartDiseaseClassifier:
             explainer_data = self.X_normalized if X is None else X
             explainer_targets = self.y if y is None else y
             self.dalex_explainer = dalex.Explainer(self.model, explainer_data, explainer_targets)
+
+        end = time.time()
+        print(f"{inspect.stack()[0][3]} time: {end - start}")
 
     def shap_analysis(self, sample_ind=20):
         shap_values = self.explainer(self.X_test[:100])
@@ -136,34 +151,65 @@ class HeartDiseaseClassifier:
         with open(filename, 'wb') as fd:
             self.dalex_explainer.dump(fd)
 
-    def denormalize_dalex_result(self, dalex_result):
-        dataset_service = DatasetService()
-        result_tpl = np.array([dalex_result.result['variable_name'], dalex_result.result['variable_value'],
-                               dalex_result.result['variable']]).T
-        temp_result = pd.DataFrame(columns=self.X.columns)
-        old_result = [0] * len(self.X.columns)
-        for i, col in enumerate(self.X.columns):
-            for var_name, var_value, variable in result_tpl:
-                if col == var_name:
-                    old_result[i] = var_value
+    def denormalize_shapley(self,shap_result):
+        start = time.time()
+        dataset_service = DatasetService()  # Assuming this can be reused and is not changing per call
 
-        temp_result.loc[len(temp_result.index)] = old_result
+        result_tpl = pd.DataFrame({
+            'variable_name': shap_result.result['variable_name'],
+            'variable_value': shap_result.result['variable_value'],
+            'variable': shap_result.result['variable']
+        })
+
+        dim = math.floor(len(result_tpl['variable']) / self.X.columns.size)
+        temp_result = pd.DataFrame(result_tpl['variable_value'].values.reshape(dim, self.X.columns.size),
+                                   columns=self.X.columns)
+        new_variable_values = self.scaler.inverse_transform(temp_result)
+        for i, col in enumerate(temp_result.columns):
+            if col in result_tpl['variable_name'].values:
+                parsed_val = math.floor(new_variable_values[0][i])
+                if dataset_service.kaggle_heart_disease_2020_columns[col]['type'] in ['boolean', 'category']:
+                    parsed_val = self.get_first_key_by_value(
+                        dataset_service.kaggle_heart_disease_2020_columns[col]['values'], parsed_val)
+
+                readable_varname = dataset_service.kaggle_heart_disease_2020_columns[col].get('title', col)
+                result_tpl.loc[result_tpl['variable_name'] == col, 'variable']=f'{readable_varname} = {parsed_val}'
+
+        shap_result.result['variable'] = result_tpl['variable'].values
+
+        end = time.time()
+        print(f"{inspect.stack()[0][3]} time: {end - start}")
+        return shap_result
+
+    def denormalize_bd_result(self, dalex_result):
+        start = time.time()
+        dataset_service = DatasetService()
+        result_tpl = pd.DataFrame({
+            'variable_name': dalex_result.result['variable_name'],
+            'variable_value': dalex_result.result['variable_value'],
+            'variable': dalex_result.result['variable']
+        })
+
+        temp_result = pd.DataFrame([None] * len(self.X.columns), index=self.X.columns).T
+
+        temp_result.loc[0, result_tpl['variable_name']] = result_tpl['variable_value'].values
+        temp_result = temp_result[self.X.columns]
         new_variable_values = self.scaler.inverse_transform(temp_result)
 
-        for i, col in enumerate(self.X.columns):
-            for j, (var_name, var_value, variable) in enumerate(result_tpl):
-                if col == var_name:
-                    parsed_val = math.floor(new_variable_values[0][i])
-                    if dataset_service.kaggle_heart_disease_2020_columns[var_name]['type'] in ['boolean', 'category']:
-                        parsed_val = self.get_first_key_by_value(dataset_service.kaggle_heart_disease_2020_columns[var_name]['values'],
-                                                                 parsed_val)
+        for i, col in enumerate(temp_result.columns):
+            if col in result_tpl['variable_name'].values:
+                parsed_val = math.floor(new_variable_values[0][i])
+                if dataset_service.kaggle_heart_disease_2020_columns[col]['type'] in ['boolean', 'category']:
+                    parsed_val = self.get_first_key_by_value(
+                        dataset_service.kaggle_heart_disease_2020_columns[col]['values'], parsed_val)
 
-                    readable_varname = dataset_service.kaggle_heart_disease_2020_columns[var_name]['title'] if 'title' in \
-                                                                                                               dataset_service.kaggle_heart_disease_2020_columns[
-                                                                                              var_name] else var_name
-                    result_tpl[j, 2] = f'{readable_varname} = {parsed_val}'
+                readable_varname = dataset_service.kaggle_heart_disease_2020_columns[col].get('title', col)
+                result_tpl.loc[result_tpl['variable_name']==col,'variable']=f'{readable_varname} = {parsed_val}'
 
-        dalex_result.result['variable'] = result_tpl[:, 2]
+        dalex_result.result['variable'] = result_tpl['variable'].values
+
+        end = time.time()
+        print(f"{inspect.stack()[0][3]} time: {end - start}")
         return dalex_result
 
     def denormalize_dalex_dataframe(self, dalex_result, variable):
@@ -177,13 +223,15 @@ class HeartDiseaseClassifier:
         readable_varnames = []
         for varname in dalex_result.result['variable']:
             readable_varnames.append(
-                dataset_service.kaggle_heart_disease_2020_columns[varname]['title'] if 'title' in dataset_service.kaggle_heart_disease_2020_columns[
-                    varname] else varname)
+                dataset_service.kaggle_heart_disease_2020_columns[varname]['title'] if 'title' in
+                                                                                       dataset_service.kaggle_heart_disease_2020_columns[
+                                                                                           varname] else varname)
 
         dalex_result.result['variable'] = readable_varnames
         return dalex_result
 
     def denormalize_x_y(self, dalex_result, variable):
+        start = time.time()
         temp_result = pd.DataFrame(columns=self.X.columns)
 
         result_row = [0] * len(self.X.columns)
@@ -194,19 +242,21 @@ class HeartDiseaseClassifier:
         denormalized_original = self.scaler.inverse_transform(temp_result)
         dalex_result.result['_x_'] = denormalized_original[:, self.X.columns.get_loc(variable)]
         dalex_result.result['_yhat_'] = dalex_result.result['_yhat_'].apply(lambda x: x * 100)
+        end = time.time()
+        print(f"{inspect.stack()[0][3]} time: {end - start}")
         return dalex_result
 
     def rename_variables(self, dalex_result):
         dataset_service = DatasetService()
         readable_varnames = []
         for varname in dalex_result.result['variable']:
-            if varname in dataset_service.kaggle_heart_disease_2020_columns and 'title' in dataset_service.kaggle_heart_disease_2020_columns[varname]:
+            if varname in dataset_service.kaggle_heart_disease_2020_columns and 'title' in \
+                    dataset_service.kaggle_heart_disease_2020_columns[varname]:
                 readable_varnames.append(dataset_service.kaggle_heart_disease_2020_columns[varname]['title'])
             else:
                 readable_varnames.append(varname)
         dalex_result.result['variable'] = readable_varnames
         return dalex_result
-
 
     def get_first_key_by_value(self, d, target_value):
         for key, value in d.items():
