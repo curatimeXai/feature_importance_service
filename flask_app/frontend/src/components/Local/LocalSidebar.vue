@@ -1,18 +1,17 @@
 <script setup>
-import {ref, onMounted, watch} from "vue";
+import {ref, onMounted, watch, inject} from "vue";
 import {storeToRefs} from 'pinia'
 import {useDashboardStore} from "@/stores/dashboard.js";
 import SliderInput from "@/components/Inputs/SliderInput.vue";
 import useEmitter from "@/composables/useEmitter.js";
 import Tooltip from "@/components/Tooltip.vue";
 
-const store = useDashboardStore();
-
+const dashboardStore = useDashboardStore();
 const inputs = ref([
   {
     key: 'weight',
     title: 'Weight',
-  },{
+  }, {
     key: 'height',
     title: 'Height',
   }, {
@@ -34,9 +33,9 @@ const inputs = ref([
     key: 'Sex',
     title: 'Sex Health',
   }, {
-  //   key: 'Race',
-  //   title: 'Race',
-  // }, {
+    //   key: 'Race',
+    //   title: 'Race',
+    // }, {
     key: 'Diabetic',
     title: 'Diabetic',
   }, {
@@ -69,16 +68,15 @@ const inputs = ref([
   },
 ])
 const sidebarForm = ref()
-const emitter = useEmitter();
+const emitter = inject('eventBus');
 
-function setFormData() {
-  store.sidebarFormData = {}
+function getFormData() {
+  let tempFormData = {}
   Array.from(sidebarForm.value.elements).forEach((input) => {
     if (input.name.length > 0)
-      store.sidebarFormData[input.name] = input.type === 'checkbox' ? input.checked : input.value
+      tempFormData[input.name] = input.type === 'checkbox' ? input.checked : input.value
   })
-  console.log('emit')
-  emitter.emit('submitSidebar')
+  return tempFormData
 }
 
 function randomize() {
@@ -101,57 +99,71 @@ function randomize() {
   })
 }
 
-watch(() => sidebarForm.value, (newValue) => {
-  if (newValue) {
-    setFormData();
-  }
+function onSubmit() {
+  console.log('submit')
+  dashboardStore.setSidebarFormData(getFormData())
+  emitter.emit('submitSidebar')
+}
+
+onMounted(() => {
+  dashboardStore.sidebarFormData = getFormData();
 });
 
 </script>
 <template>
-  <div v-if="store.datasetColumns">
-    <form ref="sidebarForm" @submit.prevent="setFormData($event)">
+  <div v-if="dashboardStore.datasetColumns">
+    <form ref="sidebarForm" @submit.prevent="onSubmit()">
       <div>
         <div class="input-group mb-1">
-            <label class="row col-12">
+          <label class="row col-12">
               <span class="flex v-align-center space-between col-9">
                 {{ 'Weight (kg)' }}
-                <Tooltip :tooltip-text="'Weight and height are used to calculate BMI. People are considered overweight for BMI > 26'"></Tooltip>
+                <Tooltip
+                    :tooltip-text="'Weight and height are used to calculate BMI. People are considered overweight for BMI > 26'"></Tooltip>
               </span>
-              <SliderInput :name="'weight'" :min="50" :max="200"></SliderInput>
-            </label>
-          </div>
+            <SliderInput :name="'weight'" :min="50" :max="200"></SliderInput>
+          </label>
+        </div>
         <div class="input-group mb-1">
-            <label class="row col-12">
+          <label class="row col-12">
               <span class="flex v-align-center space-between col-9">
                 {{ 'Height (cm)' }}
               </span>
-              <SliderInput :name="'height'" :min="100" :max="220"></SliderInput>
-            </label>
-          </div>
+            <SliderInput :name="'height'" :min="100" :max="220"></SliderInput>
+          </label>
+        </div>
         <template v-for="inputDef in inputs">
-          <div v-if="store.datasetColumns[inputDef.key]&&store.datasetColumns[inputDef.key]['type']==='numerical'" class="input-group mb-1">
+          <div
+              v-if="dashboardStore.datasetColumns[inputDef.key]&&dashboardStore.datasetColumns[inputDef.key]['type']==='numerical'"
+              class="input-group mb-1">
             <label class="row col-12" for="${label_for}">
               <span class="flex v-align-center space-between col-9">
                 {{ inputDef.title }}
                 <Tooltip v-if="inputDef.tooltip" :tooltip-text="inputDef.tooltip"></Tooltip>
               </span>
-              <SliderInput :name="inputDef.key" :min="store.datasetColumns[inputDef.key]['values'][0]"
-                           :max="store.datasetColumns[inputDef.key]['values'][1]"></SliderInput>
+              <SliderInput :name="inputDef.key" :min="dashboardStore.datasetColumns[inputDef.key]['values'][0]"
+                           :max="dashboardStore.datasetColumns[inputDef.key]['values'][1]"></SliderInput>
             </label>
           </div>
-          <div v-if="store.datasetColumns[inputDef.key]&&store.datasetColumns[inputDef.key]['type']==='category'" class="input-group mb-1">
+          <div
+              v-if="dashboardStore.datasetColumns[inputDef.key]&&dashboardStore.datasetColumns[inputDef.key]['type']==='category'"
+              class="input-group mb-1">
             <label class="row col-12 space-between" for="${label_for}">
               <span class="flex v-align-center col-6">
                  {{ inputDef.title }}
                 <Tooltip v-if="inputDef.tooltip" :tooltip-text="inputDef.tooltip"></Tooltip>
               </span>
-              <select class="col-6" :name="inputDef.key" >
-                <option v-for="(key,value) in store.datasetColumns[inputDef.key]['values']">{{ value }}</option>
+              <select class="col-6" :name="inputDef.key">
+                <option v-for="(key,value) in dashboardStore.datasetColumns[inputDef.key]['values']">{{
+                    value
+                  }}
+                </option>
               </select>
             </label>
           </div>
-          <div v-if="store.datasetColumns[inputDef.key]&&store.datasetColumns[inputDef.key]['type']==='boolean'" class="input-group mb-1">
+          <div
+              v-if="dashboardStore.datasetColumns[inputDef.key]&&dashboardStore.datasetColumns[inputDef.key]['type']==='boolean'"
+              class="input-group mb-1">
             <label class="row col-12 space-between" for="'checkbox">
               <span class="flex v-align-center col-9">
                  {{ inputDef.title }}

@@ -2,10 +2,10 @@
 import Chart from "@/components/Chart.vue";
 import Http from "@/helpers/Http.js"
 import {useDashboardStore} from "@/stores/dashboard.js";
-import {onMounted, ref} from "vue";
+import {inject, onMounted, ref} from "vue";
 import useEmitter from "@/composables/useEmitter.js";
 
-const emitter = useEmitter();
+const emitter = inject('eventBus');
 const dashboardStore = useDashboardStore();
 const chartsRef = ref([])
 const datasetBoxPlot = ref(null);

@@ -1,23 +1,33 @@
 <script setup>
 import OverviewBadge from "@/components/OverviewBadge.vue";
-import {onBeforeMount, ref} from "vue";
-import useEmitter from "@/composables/useEmitter.js";
+import {inject, onBeforeMount, ref, defineExpose, onMounted} from "vue";
 import Http from "@/helpers/Http.js";
 import {useDashboardStore} from "@/stores/dashboard.js";
 import Loader from "@/components/Loader.vue";
 
 const dashboardStore = useDashboardStore();
-const emitter = useEmitter();
 
 const overviewData = ref(null)
 
-emitter.on('submitSidebar', () => {
+function load() {
   overviewData.value=null
   Http.get(`/${dashboardStore.model}/overview`, dashboardStore.sidebarFormData).then(async response => {
     overviewData.value = await response.json();
   })
+}
+const unsubscribe=dashboardStore.$onAction((context)=>{
+  if (context.name==='setSidebarFormData') {
+    load();
+  }
 })
+onMounted(()=>{
+  load()
+})
+// emitter.on('submitSidebar', () => {
 
+defineExpose({
+  load
+})
 
 </script>
 

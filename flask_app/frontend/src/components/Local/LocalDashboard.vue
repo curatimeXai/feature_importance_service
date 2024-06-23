@@ -2,15 +2,16 @@
 import Chart from "@/components/Chart.vue";
 import Http from "@/helpers/Http.js"
 import {useDashboardStore} from "@/stores/dashboard.js";
-import {ref, watch} from "vue";
+import {inject, onMounted, ref, watch} from "vue";
 import useEmitter from "@/composables/useEmitter.js";
 import OverviewBadge from "@/components/OverviewBadge.vue";
 import LocalOverview from "@/components/Local/LocalOverview.vue";
 
 const dashboardStore = useDashboardStore();
-const emitter = useEmitter();
+const emitter = inject('eventBus');
 
 const chartsRef = ref([])
+const localOverview = ref(null)
 const modules = [
   {
     chartUrl: `/${dashboardStore.model}/breakdown`,
@@ -31,18 +32,28 @@ const modules = [
   },
 ]
 
-emitter.on('submitSidebar', () => {
-  console.log('on submit')
+const load = () => {
+  console.log('load local dashboard')
   chartsRef.value.forEach((chart, index) => {
     chart.load(Http.get(modules[index].chartUrl, dashboardStore.sidebarFormData));
   })
+}
+
+const unsubscribe=dashboardStore.$onAction((context)=>{
+  if (context.name==='setSidebarFormData') {
+    load();
+  }
+})
+
+onMounted(() => {
+  load();
 })
 
 </script>
 
 <template>
   <div id="dashboardView">
-    <LocalOverview></LocalOverview>
+    <LocalOverview ref="localOverview"></LocalOverview>
     <template v-for="(module,idx) in modules">
       <div class="flex g-1">
         <Chart ref="chartsRef" class="col-8"></Chart>

@@ -5,19 +5,21 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import {useDashboardStore} from "@/stores/dashboard.js";
 import mitt from 'mitt';
-import {createMemoryHistory, createRouter} from "vue-router";
+import {createMemoryHistory, createRouter, createWebHashHistory} from "vue-router";
 import {routes} from "@/routes.js";
 
 const emitter = mitt();
 
 const router = createRouter({
-  history: createMemoryHistory(),
+  // history: createMemoryHistory(),
+  history: createWebHashHistory(),
   routes,
 })
 const app = createApp(App)
+app.provide('eventBus',emitter);
 app.use(router)
 app.use(createPinia())
-app.config.globalProperties.emitter = emitter;
+// app.config.globalProperties.emitter = emitter;
 app.mount('#app')
 
 const dashboardStore=useDashboardStore()

@@ -13,9 +13,12 @@ export const useDashboardStore = defineStore('dashboard', () => {
   function getChartId() {
     let tempId=chartIdCounter.value
     chartIdCounter.value = tempId + 1;
-    console.log(tempId)
     return 'chart-'+tempId;
   }
 
-  return {view, sidebarFormData, datasetColumns, nestedView, model, dataset,getChartId}
+  function setSidebarFormData(sidebarFormData) {
+    sidebarFormData.value = sidebarFormData;
+  }
+
+  return {view, sidebarFormData, datasetColumns, nestedView, model, dataset,getChartId,setSidebarFormData}
 })

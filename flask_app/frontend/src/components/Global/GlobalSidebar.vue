@@ -1,7 +1,8 @@
 <script setup>
 import useEmitter from "@/composables/useEmitter.js";
+import {inject} from "vue";
 
-const emitter = useEmitter();
+const emitter = inject('eventBus');
 
 function onSwitchLineChart(event) {
   console.log('emit')
