@@ -11,8 +11,7 @@ import {routes} from "@/routes.js";
 const emitter = mitt();
 
 const router = createRouter({
-  // history: createMemoryHistory(),
-  history: createWebHashHistory(),
+  history: createMemoryHistory(),
   routes,
 })
 const app = createApp(App)
