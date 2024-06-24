@@ -5,7 +5,7 @@ import ScopeToggler from "@/components/ScopeToggler.vue";
 
 <template>
   <RouterLink to="/"
-              style="position: absolute;
+              style="position: fixed;
                     color: var(--bright-color);
                     left: 2%;
                     top: 5px;

@@ -240,26 +240,19 @@
 }
 
 .tooltip-text {
-    visibility: hidden;
     width: 250px;
     background-color: black;
     color: #fff;
     text-align: center;
     border-radius: 5px;
     padding: 5px;
-    position: absolute;
+    position: fixed;
     z-index: 1;
-    left: 450%;
-    margin-left: -100px;
-    opacity: 0;
+    /*left: 450%;*/
+    /*margin-left: -100px;*/
+
     transition: opacity 0.3s;
 }
-
-.tooltip-container:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
-}
-
 
 /*Inputs CSS*/
 
@@ -413,12 +406,31 @@ input[type="range"]::-ms-track {
     height: 0.5em;
 }
 
+.router-link-button{
+    border: 2px solid var(--primary-color);
+    display: block;
+    text-decoration: none;
+    background: hsla(0, 0%, 0%, 0);
+    padding: var(--default-padding);
+    color: var(--primary-color);
+    border-radius: var(--border-radius);
+    transition: 1s;
+    font-size: 12pt;
+}
+
+.router-link-button:hover,
+.router-link-button:focus,
+.router-link-button:active {
+    background: var(--primary-color);
+    color: var(--bright-color);
+}
+
 input[type="button"],
 button {
     appearance: none;
-    border: 0.2em solid var(--primary-color);
+    border: 2px solid var(--primary-color);
     background: hsla(0, 0%, 0%, 0);
-    padding: 0.85em;
+    padding: var(--default-padding);
     color: var(--primary-color);
     border-radius: var(--border-radius);
     transition: 1s;
@@ -495,18 +507,36 @@ input[type="number"]::-webkit-inner-spin-button {
 
 select {
     appearance: none;
+    -webkit-appearance: none;  /* Safari and Chrome */
+    -moz-appearance: none;  /* Firefox */
     padding: 0.85em 1.5em;
     border: 0.2em solid var(--primary-color);
     border-radius: var(--border-radius);
     background: hsla(0, 0%, 0%, 0);
     color: var(--primary-color);
     transition: 1s;
+    position: relative;  /* Ensure the arrow is positioned relative to the select */
+}
+
+select::after {
+    content: '▼';  /* Unicode character for a down arrow */
+    position: absolute;
+    top: 50%;
+    right: 1em;
+    transform: translateY(-50%);
+    pointer-events: none;  /* Ensure the arrow doesn't block clicks */
+    color: var(--primary-color);  /* Arrow color matches the primary color */
 }
 
 select:hover,
 select:focus {
     background: var(--primary-color);
     color: var(--bright-color);
+}
+
+select:hover::after,
+select:focus::after {
+    color: var(--bright-color);  /* Change arrow color on hover/focus */
 }
 
 body {

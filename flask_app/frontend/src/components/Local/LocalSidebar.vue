@@ -4,7 +4,7 @@ import {storeToRefs} from 'pinia'
 import {useDashboardStore} from "@/stores/dashboard.js";
 import SliderInput from "@/components/Inputs/SliderInput.vue";
 import useEmitter from "@/composables/useEmitter.js";
-import Tooltip from "@/components/Tooltip.vue";
+import TooltipTrigger from "@/components/TooltipTrigger.vue";
 
 const dashboardStore = useDashboardStore();
 const inputs = ref([
@@ -16,16 +16,16 @@ const inputs = ref([
     title: 'Height',
   }, {
     key: 'PhysicalHealth',
-    title: 'Physical Health',
-    tooltip: 'For how many days during the past 30 days was the physical health good?'
+    title: 'Good Physical Health (days)',
+    tooltip: 'For how many days during the past 30 days was the physical health good? Example: 30 days would mean that I had a good physical health in the past 30 days.'
   }, {
     key: 'MentalHealth',
-    title: 'Mental Health',
-    tooltip: 'For how many days during the past 30 days was the mental health good?'
+    title: 'Good Mental Health (days)',
+    tooltip: 'For how many days during the past 30 days was the mental health good? Example: 30 days would mean that I had a good mental health in the past 30 days.'
   }, {
     key: 'SleepTime',
-    title: 'Sleep Time',
-    tooltip: 'Amount of sleep time can have an significant effect on the probability of having heart disease.'
+    title: 'Sleep Time (hours)',
+    tooltip: 'Average sleep time in the past Month. Amount of sleep time can have an significant effect on the probability of having heart disease.'
   }, {
     key: 'AgeCategory',
     title: 'Age Category',
@@ -43,19 +43,22 @@ const inputs = ref([
     title: 'General Health',
   }, {
     key: 'Smoking',
-    title: 'Is Smoking',
+    title: 'Has Smoked',
+    tooltip: 'Has smoked more than 100 cigarettes.'
   }, {
     key: 'AlcoholDrinking',
-    title: 'Drinks alcohol',
+    title: 'Drinks Alcohol',
   }, {
     key: 'Stroke',
     title: 'Had Stroke',
   }, {
     key: 'DiffWalking',
     title: 'Has difficulties walking',
+    tooltip: 'Has difficulties walking or climbing stairs.'
   }, {
     key: 'PhysicalActivity',
     title: 'Is physically active',
+    tooltip: 'Was physically active in the last month.'
   }, {
     key: 'Asthma',
     title: 'Has Asthma',
@@ -118,14 +121,14 @@ onMounted(() => {
           <label class="row col-12">
               <span class="flex v-align-center space-between col-9">
                 {{ 'Weight (kg)' }}
-                <Tooltip
-                    :tooltip-text="'Weight and height are used to calculate BMI. People are considered overweight for BMI > 26'"></Tooltip>
+                <TooltipTrigger
+                    :tooltip-text="'Weight and height are used to calculate BMI. People are considered overweight for BMI > 26'"></TooltipTrigger>
               </span>
             <SliderInput :name="'weight'" :min="50" :max="200"></SliderInput>
           </label>
         </div>
         <div class="input-group mb-1">
-          <label class="row col-12">
+          <label class="row col-12" for="slider">
               <span class="flex v-align-center space-between col-9">
                 {{ 'Height (cm)' }}
               </span>
@@ -136,10 +139,10 @@ onMounted(() => {
           <div
               v-if="dashboardStore.datasetColumns[inputDef.key]&&dashboardStore.datasetColumns[inputDef.key]['type']==='numerical'"
               class="input-group mb-1">
-            <label class="row col-12" for="${label_for}">
+            <label class="row col-12">
               <span class="flex v-align-center space-between col-9">
                 {{ inputDef.title }}
-                <Tooltip v-if="inputDef.tooltip" :tooltip-text="inputDef.tooltip"></Tooltip>
+                <TooltipTrigger v-if="inputDef.tooltip" :tooltip-text="inputDef.tooltip"></TooltipTrigger>
               </span>
               <SliderInput :name="inputDef.key" :min="dashboardStore.datasetColumns[inputDef.key]['values'][0]"
                            :max="dashboardStore.datasetColumns[inputDef.key]['values'][1]"></SliderInput>
@@ -148,10 +151,10 @@ onMounted(() => {
           <div
               v-if="dashboardStore.datasetColumns[inputDef.key]&&dashboardStore.datasetColumns[inputDef.key]['type']==='category'"
               class="input-group mb-1">
-            <label class="row col-12 space-between" for="${label_for}">
+            <label class="row col-12 space-between">
               <span class="flex v-align-center col-6">
                  {{ inputDef.title }}
-                <Tooltip v-if="inputDef.tooltip" :tooltip-text="inputDef.tooltip"></Tooltip>
+                <TooltipTrigger v-if="inputDef.tooltip" :tooltip-text="inputDef.tooltip"></TooltipTrigger>
               </span>
               <select class="col-6" :name="inputDef.key">
                 <option v-for="(key,value) in dashboardStore.datasetColumns[inputDef.key]['values']">{{
@@ -164,10 +167,10 @@ onMounted(() => {
           <div
               v-if="dashboardStore.datasetColumns[inputDef.key]&&dashboardStore.datasetColumns[inputDef.key]['type']==='boolean'"
               class="input-group mb-1">
-            <label class="row col-12 space-between" for="'checkbox">
-              <span class="flex v-align-center col-9">
+            <label class="row col-12 space-between v-align-center">
+              <span class="flex v-align-center space-between col-9">
                  {{ inputDef.title }}
-                <Tooltip v-if="inputDef.tooltip" :tooltip-text="inputDef.tooltip"></Tooltip>
+                <TooltipTrigger v-if="inputDef.tooltip" :tooltip-text="inputDef.tooltip"></TooltipTrigger>
               </span>
               <input type="checkbox" :name="inputDef.key" class="col-3">
             </label>
@@ -176,7 +179,7 @@ onMounted(() => {
       </div>
       <div class="flex" style="gap: 10px">
         <button id="randomizer" type="button" @click="randomize" class="col-6">Randomize</button>
-        <button type="submit" class="col-6">Explain</button>
+        <button type="submit" class="col-6">Analyze</button>
       </div>
     </form>
   </div>

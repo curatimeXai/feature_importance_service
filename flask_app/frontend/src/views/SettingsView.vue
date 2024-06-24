@@ -19,9 +19,10 @@ dashboardStore.nestedView = 'model'
     <SettingsSidebar></SettingsSidebar>
   </div>
   <div class="capsule" style="margin-left: 19%; z-index: -1; position: absolute; width: 78%;">
-    <ModelSettings v-if="dashboardStore.nestedView==='model'"></ModelSettings>
-    <DatasetSettings v-if="dashboardStore.nestedView==='dataset'"></DatasetSettings>
-    <FrequentQuestions v-if="dashboardStore.nestedView==='frequent-questions'"></FrequentQuestions>
+    <RouterView></RouterView>
+<!--    <ModelSettings v-if="dashboardStore.nestedView==='model'"></ModelSettings>-->
+<!--    <DatasetSettings v-if="dashboardStore.nestedView==='dataset'"></DatasetSettings>-->
+<!--    <FrequentQuestions v-if="dashboardStore.nestedView==='frequent-questions'"></FrequentQuestions>-->
   </div>
 </template>
 

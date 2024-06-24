@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@popperjs/core": "^2.11.8",
     "mitt": "^3.0.1",
     "pinia": "^2.1.7",
     "plotly.js-dist": "^2.33.0",

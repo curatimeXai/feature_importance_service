@@ -30,7 +30,7 @@ function toggle(event, view) {
     </RouterLink>
     <RouterLink to="/global" title="In global scope you can see the analysis of the model on the whole dataset">Global
     </RouterLink>
-    <RouterLink to="/settings">
+    <RouterLink to="/settings/model">
       <i class="fa fa-cog"></i>
     </RouterLink>
   </div>

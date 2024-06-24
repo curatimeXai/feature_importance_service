@@ -6,7 +6,12 @@ import ScopeToggler from "@/components/ScopeToggler.vue";
 </script>
 
 <template>
-  <div class="col-2 capsule" style="position: fixed; top: 10px;">
+  <div class="col-2 capsule" style="
+      position: fixed;
+      top: 10px;
+      height: 96vh;
+      overflow-y: auto;
+      overflow-x: hidden;">
     <ScopeToggler></ScopeToggler>
     <LocalSidebar></LocalSidebar>
   </div>

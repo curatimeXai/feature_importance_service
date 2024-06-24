@@ -5,9 +5,17 @@ const dashboardStore = useDashboardStore();
 </script>
 
 <template>
-  <button @click="dashboardStore.nestedView='model'" class="col-12 mb-1">Model</button>
-  <button @click="dashboardStore.nestedView='dataset'" class="col-12 mb-1">Dataset</button>
-  <button @click="dashboardStore.nestedView='frequent-questions'" class="col-12 mb-1">Frequent questions</button>
+  <div>
+    <RouterLink class="router-link-button mb-1" to="/settings/model">
+      Model
+    </RouterLink>
+    <RouterLink class="router-link-button mb-1" to="/settings/dataset">
+      Dataset
+    </RouterLink>
+    <RouterLink class="router-link-button" to="/settings/questions">
+      Frequent Questions
+    </RouterLink>
+  </div>
 </template>
 
 <style scoped>
