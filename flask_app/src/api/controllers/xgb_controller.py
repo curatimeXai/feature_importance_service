@@ -10,18 +10,18 @@ from src.helpers import get_trained_models_path, get_explainers_path
 from src.models.heart_disease_model import HeartDiseaseClassifier
 from src.services.dataset_service import DatasetService
 
-MODEL_PATH = get_trained_models_path("xdg_model2.pkl")
-EXPLAINER_PATH = get_explainers_path("xdg_explainer2.pkl")
+MODEL_PATH = get_trained_models_path("xgb_model2.pkl")
+EXPLAINER_PATH = get_explainers_path("xgb_explainer2.pkl")
 
 
-def xdg_accuracy():
+def xgb_accuracy():
     dataset_service = DatasetService()
     classifier = HeartDiseaseClassifier(data=dataset_service.kaggle_heart_disease_2020)
     classifier.load_model(MODEL_PATH)
     return classifier.test_accuracy()
 
 
-def xdg_variable_importance_image():
+def xgb_variable_importance_image():
     dataset_service = DatasetService()
     classifier = HeartDiseaseClassifier(data=dataset_service.kaggle_heart_disease_2020)
     classifier.load_model(MODEL_PATH)
@@ -33,7 +33,7 @@ def xdg_variable_importance_image():
     return 'data:image/png;base64,' + plot_url
 
 
-def xdg_variable_importance():
+def xgb_variable_importance():
     dataset_service = DatasetService()
     classifier = HeartDiseaseClassifier(data=dataset_service.kaggle_heart_disease_2020)
     classifier.load_model(MODEL_PATH)
@@ -43,7 +43,7 @@ def xdg_variable_importance():
     return renamed_variables_vi.plot(show=False, title="Risk Factor Importance", max_vars=16).to_json()
 
 
-def xdg_model_performance():
+def xgb_model_performance():
     dataset_service = DatasetService()
     classifier = HeartDiseaseClassifier(data=dataset_service.kaggle_heart_disease_2020)
     classifier.load_model(MODEL_PATH)
@@ -52,7 +52,7 @@ def xdg_model_performance():
     return mp.plot(geom="roc", show=False).to_json()
 
 
-def xdg_pdp(variable):
+def xgb_pdp(variable):
     dataset_service = DatasetService()
     classifier = HeartDiseaseClassifier(data=dataset_service.kaggle_heart_disease_2020)
     classifier.load_model(MODEL_PATH)
@@ -62,7 +62,7 @@ def xdg_pdp(variable):
     return denormalized_pdp.plot(show=False, title="Probability by Value (Aggregated)").to_json()
 
 
-def xdg_break_down(input):
+def xgb_break_down(input):
     start = time.time()
     dataset_service = DatasetService()
     classifier = HeartDiseaseClassifier(data=dataset_service.kaggle_heart_disease_2020)
@@ -83,7 +83,7 @@ def xdg_break_down(input):
                                 title='Risk Factors (Accumulative)', max_vars=16).to_json()
 
 
-def xdg_overview(input):
+def xgb_overview(input):
     start = time.time()
     dataset_service = DatasetService()
     classifier = HeartDiseaseClassifier(data=dataset_service.kaggle_heart_disease_2020)
@@ -101,11 +101,11 @@ def xdg_overview(input):
     features = filtered_overview[filtered_overview[:, 0] != 'prediction']
     sorted_features = features[features[:, 1].argsort()]
     end = time.time()
-    print(f"xdg_overview time: {end - start}")
+    print(f"xgb_overview time: {end - start}")
     return {'prediction': prediction[0, 1], 'features': sorted_features.tolist()}
 
 
-def xdg_shapley(input):
+def xgb_shapley(input):
     start = time.time()
     dataset_service = DatasetService()
     classifier = HeartDiseaseClassifier(data=dataset_service.kaggle_heart_disease_2020)
@@ -122,7 +122,7 @@ def xdg_shapley(input):
                                    title='Risk Factors (Comparison)', max_vars=16).to_json()
 
 
-def xdg_ceteris_parabus(input, variable):
+def xgb_ceteris_parabus(input, variable):
     dataset_service = DatasetService()
     classifier = HeartDiseaseClassifier(data=dataset_service.kaggle_heart_disease_2020)
     inputDf = pd.DataFrame(columns=classifier.X.columns)

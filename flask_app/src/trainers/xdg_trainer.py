@@ -7,8 +7,8 @@ from src.models.heart_disease_model import HeartDiseaseClassifier
 from src.services.dataset_service import DatasetService
 
 dataset_service=DatasetService()
-MODEL_PATH = get_trained_models_path("xdg_model2.pkl")
-EXPLAINER_PATH = get_explainers_path("xdg_explainer2.pkl")
+MODEL_PATH = get_trained_models_path("xgb_model2.pkl")
+EXPLAINER_PATH = get_explainers_path("xgb_explainer2.pkl")
 data_path = dataset_service.datasets_paths[1]
 do_train = True
 classifier = HeartDiseaseClassifier(data_path, model=xgboost.XGBClassifier())

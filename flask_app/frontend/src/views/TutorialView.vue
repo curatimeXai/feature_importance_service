@@ -44,7 +44,7 @@ import ScopeToggler from "@/components/ScopeToggler.vue";
             <li>The checkboxes are all unchecked</li>
           </ul>
         </div>
-        <img src="../assets/images/local_sidebar_alex_bad_upper.png" alt="Me as an old person">
+        <img src="@/assets/images/local_sidebar_alex_bad_upper.png" alt="Me as an old person">
       </div>
       <div class="mb-1">
         <div class="flex g-1 mb-1">
@@ -55,9 +55,9 @@ import ScopeToggler from "@/components/ScopeToggler.vue";
               In the overview, we can clearly see that there is a high risk of having heart disease.<br>
               The risk factors are listed from strongest positive risk factors to the worse ones.
             </p>
+            <p>Small example: Not smoking reduces the risk with 3.42%, however being 80 or older increases the risk with 17.89%!</p>
           </div>
-          <!--          todo: give example-->
-          <img class="col-6" src="../assets/images/local_dashboard_overview_bad.png" alt="Me as an old person">
+          <img class="col-6" src="@/assets/images/local_dashboard_overview_bad.png" alt="Me as an old person">
         </div>
         <div class="flex g-1 mb-1">
           <div>
@@ -70,9 +70,10 @@ import ScopeToggler from "@/components/ScopeToggler.vue";
             <p>However, because of the other factors, the probability also decreases.</p>
             <p><i class="fa fa-triangle-exclamation" style="color: var(--warning-color);"></i> All probability values in
               charts are written in mathematical writing. This means that <b>10% is 0.1</b>.</p>
+            <p>Break Down Chart orders the risk factors by their contribution.</p>
+            <p>Small example: General Health = Poor increases the risk by 10%</p>
           </div>
-          <!--          todo: Explain some bars-->
-          <img class="col-8" src="../assets/images/local_dashboard_break_down_chart.png" alt="Me as an old person">
+          <img class="col-8" src="@/assets/images/local_dashboard_break_down_chart.png" alt="Me as an old person">
         </div>
         <div class="flex g-1 mb-1">
           <div>
@@ -80,10 +81,10 @@ import ScopeToggler from "@/components/ScopeToggler.vue";
             <p>
               This chart is rather relevant for comparing the influence of certain risk factors.
             </p>
+            <p>An important difference to the Break Down Chart is that the Shapley Chart calculates an average of possible risk factors order.</p>
+            <p>Small example: General Health = Poor increases in average the risk by 15.6%!</p>
           </div>
-          <!--          todo: why is there a difference between breakdown and shapley in terms of contribution-->
-          <!--          todo: give examples-->
-          <img class="col-8" src="../assets/images/local_dashboard_shapley_chart.png" alt="Me as an old person">
+          <img class="col-8" src="@/assets/images/local_dashboard_shapley_chart.png" alt="Me as an old person">
         </div>
       </div>
       <div>
@@ -96,9 +97,9 @@ import ScopeToggler from "@/components/ScopeToggler.vue";
             </p>
           </div>
           <div class="col-8">
-            <img class="col-12" src="../assets/images/global_boolean_columns_percentage.png" alt="Me as an old person">
-            <img class="col-12" src="../assets/images/global_categorical_charts.png" alt="Me as an old person">
-            <img class="col-12" src="../assets/images/global_numerical_boxplots.png" alt="Me as an old person">
+            <img class="col-12" src="@/assets/images/global_boolean_columns_percentage.png" alt="Me as an old person">
+            <img class="col-12" src="@/assets/images/global_categorical_charts.png" alt="Me as an old person">
+            <img class="col-12" src="@/assets/images/global_numerical_boxplots.png" alt="Me as an old person">
           </div>
         </div>
         <div class="flex g-1 mb-1">
@@ -109,8 +110,8 @@ import ScopeToggler from "@/components/ScopeToggler.vue";
             </p>
           </div>
           <div class="col-8">
-            <img class="col-12" src="../assets/images/global_variable_importance.png" alt="Me as an old person">
-            <img class="col-12" src="../assets/images/global_partial_dependency_chart.png" alt="Me as an old person">
+            <img class="col-12" src="@/assets/images/global_variable_importance.png" alt="Me as an old person">
+            <img class="col-12" src="@/assets/images/global_partial_dependency_chart.png" alt="Me as an old person">
           </div>
         </div>
         <div>
@@ -122,7 +123,7 @@ import ScopeToggler from "@/components/ScopeToggler.vue";
                 You can change the predicting model, the dataset and view frequent questions
               </p>
             </div>
-            <img class="col-8" src="../assets/images/settings_view.png" alt="Me as an old person">
+            <img class="col-8" src="@/assets/images/settings_view.png" alt="Me as an old person">
           </div>
         </div>
       </div>

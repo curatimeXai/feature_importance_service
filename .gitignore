@@ -26,3 +26,4 @@
 /flask_app/templates/assets/
 /flask_app/.env
 /flask_app/store/
+/flask_app/templates/

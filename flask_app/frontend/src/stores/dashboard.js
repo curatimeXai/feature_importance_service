@@ -7,7 +7,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
   const nestedView = ref('')
   const datasetColumns = ref(null)
   const sidebarFormData = ref(null)
-  const model = ref('xdg');
+  const model = ref('xgb');
   const dataset = ref('kaggle_heart_disease_2020');
 
   function getChartId() {
