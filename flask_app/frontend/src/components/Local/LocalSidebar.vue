@@ -5,6 +5,7 @@ import {useDashboardStore} from "@/stores/dashboard.js";
 import SliderInput from "@/components/Inputs/SliderInput.vue";
 import useEmitter from "@/composables/useEmitter.js";
 import TooltipTrigger from "@/components/TooltipTrigger.vue";
+import Select from "@/components/Inputs/Select.vue";
 
 const dashboardStore = useDashboardStore();
 const inputs = ref([
@@ -156,12 +157,12 @@ onMounted(() => {
                  {{ inputDef.title }}
                 <TooltipTrigger v-if="inputDef.tooltip" :tooltip-text="inputDef.tooltip"></TooltipTrigger>
               </span>
-              <select class="col-6" :name="inputDef.key">
+              <Select class="col-6" :name="inputDef.key">
                 <option v-for="(key,value) in dashboardStore.datasetColumns[inputDef.key]['values']">{{
                     value
                   }}
                 </option>
-              </select>
+              </Select>
             </label>
           </div>
           <div

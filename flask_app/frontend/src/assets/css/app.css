@@ -70,7 +70,7 @@
     padding-right: 20px;
 }
 
-.p-1{
+.p-1 {
     padding: 10px;
 }
 
@@ -188,8 +188,8 @@
 }
 
 .disabled {
-  pointer-events: none;
-  cursor: default;
+    pointer-events: none;
+    cursor: default;
 }
 
 .iframe-wrapper {
@@ -406,7 +406,7 @@ input[type="range"]::-ms-track {
     height: 0.5em;
 }
 
-.router-link-button{
+.router-link-button {
     border: 2px solid var(--primary-color);
     display: block;
     text-decoration: none;
@@ -507,25 +507,29 @@ input[type="number"]::-webkit-inner-spin-button {
 
 select {
     appearance: none;
-    -webkit-appearance: none;  /* Safari and Chrome */
-    -moz-appearance: none;  /* Firefox */
+    -webkit-appearance: none; /* Safari and Chrome */
+    -moz-appearance: none; /* Firefox */
     padding: 0.85em 1.5em;
     border: 0.2em solid var(--primary-color);
     border-radius: var(--border-radius);
     background: hsla(0, 0%, 0%, 0);
     color: var(--primary-color);
     transition: 1s;
-    position: relative;  /* Ensure the arrow is positioned relative to the select */
+    position: relative; /* Ensure the arrow is positioned relative to the select */
+}
+
+select::before {
+    border: solid black;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
 }
 
 select::after {
-    content: '▼';  /* Unicode character for a down arrow */
-    position: absolute;
-    top: 50%;
-    right: 1em;
-    transform: translateY(-50%);
-    pointer-events: none;  /* Ensure the arrow doesn't block clicks */
-    color: var(--primary-color);  /* Arrow color matches the primary color */
+    border: solid black;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
 }
 
 select:hover,
@@ -536,7 +540,7 @@ select:focus {
 
 select:hover::after,
 select:focus::after {
-    color: var(--bright-color);  /* Change arrow color on hover/focus */
+    color: var(--bright-color); /* Change arrow color on hover/focus */
 }
 
 body {
