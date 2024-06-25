@@ -115,11 +115,7 @@ class DatasetService:
             if self.kaggle_heart_disease_2020_columns[col]['type'] == 'category':
                 transformed_input.append(self.kaggle_heart_disease_2020_columns[col]['values'][input[col]])
             if self.kaggle_heart_disease_2020_columns[col]['type'] == 'numerical':
-                if self.kaggle_heart_disease_2020_columns[col].get('invertValue', False):
-                    transformed_input.append(
-                        abs(float(input[col]) - self.kaggle_heart_disease_2020_columns[col]['values'][1]))
-                else:
-                    transformed_input.append(float(input[col]))
+                transformed_input.append(float(input[col]))
 
         return transformed_input
 

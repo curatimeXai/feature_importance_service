@@ -115,7 +115,7 @@ def xgb_shapley(input):
     classifier.load_model(MODEL_PATH)
     classifier.load_dalex_explainer(EXPLAINER_PATH)
     shapl = classifier.dalex_explainer.predict_parts(scaled_input, type='shap', B=10, N=1000)
-    shapl_denormalized = classifier.denormalize_shapley(shapl)
+    shapl_denormalized = classifier.denormalize_shapley(shapl, input)
     end = time.time()
     print(f"{inspect.stack()[0][3]} time: {end - start}")
     return shapl_denormalized.plot(show=False, vcolors=["#371ea3", "#f05a71", "#8bdcbe"],

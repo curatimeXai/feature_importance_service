@@ -148,18 +148,19 @@ class HeartDiseaseClassifier:
         with open(filename, 'wb') as fd:
             self.dalex_explainer.dump(fd)
 
-    def denormalize_shapley(self, dalex_result):
+    def denormalize_shapley(self, dalex_result, input):
         start = time.time()
         result_tpl = np.array([dalex_result.result['variable_name'], dalex_result.result['variable_value'],
                                dalex_result.result['variable']]).T
-        temp_result = pd.DataFrame(columns=self.X.columns)
-        for i, col in enumerate(self.X.columns):
-            temp_result[col] = result_tpl[result_tpl[:, 0] == col, 1]
-        new_variable_values = self.scaler.inverse_transform(temp_result)
 
         for i, col in enumerate(self.X.columns):
-            result_tpl[result_tpl[:, 0] == col, 2] = np.apply_along_axis(
-                lambda x: self.denormalize_variable_row(col, x), axis=0, arr=new_variable_values[:, i])
+            parsed_val = input[col]
+            if self.dataset_service.kaggle_heart_disease_2020_columns[col]['type'] == 'numerical':
+                parsed_val = int(float(input[col]))
+            if self.dataset_service.kaggle_heart_disease_2020_columns[col]['type'] == 'boolean':
+                parsed_val = 'Yes' if input[col] == 'true' else 'No'
+            result_tpl[result_tpl[:, 0] == col, 2] = \
+                f"{self.dataset_service.kaggle_heart_disease_2020_columns[col].get('title', col)} = {parsed_val}"
 
         dalex_result.result['variable'] = result_tpl[:, 2]
         end = time.time()
