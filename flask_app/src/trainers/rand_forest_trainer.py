@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+from dotenv import load_dotenv
 from keras import Sequential
 from keras.layers import Dense
 from sklearn.ensemble import RandomForestClassifier
@@ -8,6 +9,7 @@ from sklearn.svm import SVC
 from src.helpers import get_trained_models_path, get_explainers_path
 from src.models.heart_disease_model import HeartDiseaseClassifier
 from src.services.dataset_service import DatasetService
+load_dotenv()
 
 dataset_service=DatasetService()
 data_path = dataset_service.datasets_paths[1]

@@ -9,8 +9,8 @@ from src.models.heart_disease_model import HeartDiseaseClassifier
 from src.services.dataset_service import DatasetService
 
 
-MODEL_PATH = get_trained_models_path("dnn_model2.pkl")
-EXPLAINER_PATH = get_explainers_path("dnn_explainer2.pkl")
+MODEL_PATH = get_trained_models_path("dnn_model.pkl")
+EXPLAINER_PATH = get_explainers_path("dnn_explainer.pkl")
 
 def dnn_accuracy():
     dataset_service = DatasetService()
@@ -68,7 +68,7 @@ def dnn_break_down(input):
     scaled_input = classifier.scaler.transform(inputDf)
     classifier.load_model(MODEL_PATH)
     classifier.load_dalex_explainer(EXPLAINER_PATH)
-    bd_normal = classifier.dalex_explainer.predict_parts(scaled_input, N=500, type='break_down')
+    bd_normal = classifier.dalex_explainer.predict_parts(scaled_input, N=100, type='break_down')
     bd_denormalized = classifier.denormalize_bd_result(bd_normal)
     # bd_normal = classifier.dalex_explainer.predict_parts(classifier.X_test_denormalized.iloc[0], type='break_down', label=classifier.y_test_denormalized.iloc[0])
     # bd_interactions = classifier.dalex_explainer.predict_parts(classifier.X_test[0], type='break_down_interactions',
@@ -85,7 +85,7 @@ def dnn_overview(input):
     scaled_input = classifier.scaler.transform(inputDf)
     classifier.load_model(MODEL_PATH)
     classifier.load_dalex_explainer(EXPLAINER_PATH)
-    bd_normal = classifier.dalex_explainer.predict_parts(scaled_input, N=500, type='break_down')
+    bd_normal = classifier.dalex_explainer.predict_parts(scaled_input, N=100, type='break_down')
     bd_denormalized = classifier.denormalize_bd_result(bd_normal)
     bd_denormalized.result['contribution'] = bd_denormalized.result['contribution'].apply(lambda x: x * 100)
     overview = np.array([bd_denormalized.result['variable'], bd_denormalized.result['contribution']]).T
@@ -104,7 +104,7 @@ def dnn_shapley(input):
     scaled_input = classifier.scaler.transform(inputDf)
     classifier.load_model(MODEL_PATH)
     classifier.load_dalex_explainer(EXPLAINER_PATH)
-    shapl = classifier.dalex_explainer.predict_parts(scaled_input, N=500, type='shap', B=10)
+    shapl = classifier.dalex_explainer.predict_parts(scaled_input, N=100, type='shap', B=10)
     shapl_denormalized = classifier.denormalize_shapley(shapl)
     return shapl_denormalized.plot(show=False, vcolors=["#371ea3", "#f05a71", "#8bdcbe"]).to_json()
 

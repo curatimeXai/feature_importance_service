@@ -1,4 +1,3 @@
-import functools
 import inspect
 import math
 import os
@@ -7,13 +6,10 @@ import time
 import dalex
 import joblib
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import shap
-import xgboost
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, log_loss
 
 from src.services.dataset_service import DatasetService
@@ -107,7 +103,6 @@ class HeartDiseaseClassifier:
         else:
             self.explainer = shap.Explainer(self.model.predict, self.X_sample)
 
-    @functools.cache
     def load_dalex_explainer(self, explainer_path=None, X=None, y=None):
         start = time.time()
         if explainer_path is not None and os.path.exists(explainer_path):

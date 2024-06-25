@@ -1,10 +1,12 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import xgboost
+from dotenv import load_dotenv
 
 from src.helpers import get_trained_models_path, get_explainers_path
 from src.models.heart_disease_model import HeartDiseaseClassifier
 from src.services.dataset_service import DatasetService
+load_dotenv()
 
 dataset_service=DatasetService()
 MODEL_PATH = get_trained_models_path("xgb_model2.pkl")

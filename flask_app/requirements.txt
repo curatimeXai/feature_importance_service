@@ -13,3 +13,4 @@ shap==0.45.0
 xgboost==2.1.0
 gunicorn==22.0.0
 python-dotenv==1.0.1
+tensorflow==2.11.1

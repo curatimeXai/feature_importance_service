@@ -8,8 +8,8 @@ from src.helpers import get_trained_models_path, get_explainers_path
 from src.models.heart_disease_model import HeartDiseaseClassifier
 from src.services.dataset_service import DatasetService
 
-MODEL_PATH = get_trained_models_path("svm_model2.pkl")
-EXPLAINER_PATH = get_explainers_path("svm_explainer2.pkl")
+MODEL_PATH = get_trained_models_path("svm_model.pkl")
+EXPLAINER_PATH = get_explainers_path("svm_explainer.pkl")
 
 
 def svm_accuracy():
