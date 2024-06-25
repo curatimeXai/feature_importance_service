@@ -1,6 +1,6 @@
 <script setup>
 import OverviewBadge from "@/components/OverviewBadge.vue";
-import {inject, onBeforeMount, ref, defineExpose, onMounted} from "vue";
+import {inject, onBeforeMount, ref, defineExpose, onMounted, onBeforeUnmount} from "vue";
 import Http from "@/helpers/Http.js";
 import {useDashboardStore} from "@/stores/dashboard.js";
 import Loader from "@/components/Loader.vue";
@@ -10,23 +10,23 @@ const dashboardStore = useDashboardStore();
 const overviewData = ref(null)
 
 function load() {
-  overviewData.value=null
+  overviewData.value = null
   Http.get(`/${dashboardStore.model}/overview`, dashboardStore.sidebarFormData).then(async response => {
     overviewData.value = await response.json();
   })
 }
-const unsubscribe=dashboardStore.$onAction((context)=>{
-  if (context.name==='setSidebarFormData') {
-    load();
+
+const unsubscribe = dashboardStore.$onAction(({name, after}) => {
+  if (name === 'setSidebarFormData') {
+    after(() => load());
   }
 })
-onMounted(()=>{
+onMounted(() => {
   load()
 })
-// emitter.on('submitSidebar', () => {
 
-defineExpose({
-  load
+onBeforeUnmount(() => {
+  unsubscribe();
 })
 
 </script>

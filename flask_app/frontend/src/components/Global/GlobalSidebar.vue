@@ -1,12 +1,10 @@
 <script setup>
-import useEmitter from "@/composables/useEmitter.js";
 import {inject} from "vue";
+import {useDashboardStore} from "@/stores/dashboard.js";
 
-const emitter = inject('eventBus');
-
+const dashboardStore = useDashboardStore();
 function onSwitchLineChart(event) {
-  console.log('emit')
-  emitter.emit('switchAggregatedProfiles', event.target.value)
+  dashboardStore.setSidebarFormData(event.target.value)
 }
 </script>
 

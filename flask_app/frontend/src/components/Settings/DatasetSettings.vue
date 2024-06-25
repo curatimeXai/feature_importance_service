@@ -2,7 +2,6 @@
 import {useDashboardStore} from "@/stores/dashboard.js";
 
 const dashboardStore = useDashboardStore();
-console.log(dashboardStore.datasetColumns)
 </script>
 
 <template>

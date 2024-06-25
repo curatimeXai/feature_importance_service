@@ -106,7 +106,6 @@ function randomize() {
 function onSubmit() {
   console.log('submit')
   dashboardStore.setSidebarFormData(getFormData())
-  emitter.emit('submitSidebar')
 }
 
 onMounted(() => {

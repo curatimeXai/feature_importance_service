@@ -2,7 +2,7 @@
 import Chart from "@/components/Chart.vue";
 import Http from "@/helpers/Http.js"
 import {useDashboardStore} from "@/stores/dashboard.js";
-import {inject, onMounted, ref, watch} from "vue";
+import {inject, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import useEmitter from "@/composables/useEmitter.js";
 import OverviewBadge from "@/components/OverviewBadge.vue";
 import LocalOverview from "@/components/Local/LocalOverview.vue";
@@ -33,20 +33,22 @@ const modules = [
 ]
 
 const load = () => {
-  console.log('load local dashboard')
   chartsRef.value.forEach((chart, index) => {
     chart.load(Http.get(modules[index].chartUrl, dashboardStore.sidebarFormData));
   })
 }
 
-const unsubscribe=dashboardStore.$onAction((context)=>{
-  if (context.name==='setSidebarFormData') {
-    load();
+const unsubscribe = dashboardStore.$onAction(({name, after}) => {
+  if (name === 'setSidebarFormData') {
+    after(() => load());
   }
 })
 
 onMounted(() => {
   load();
+})
+onBeforeUnmount(()=>{
+  unsubscribe();
 })
 
 </script>

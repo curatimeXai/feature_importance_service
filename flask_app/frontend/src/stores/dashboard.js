@@ -16,8 +16,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
     return 'chart-'+tempId;
   }
 
-  function setSidebarFormData(sidebarFormData) {
-    sidebarFormData.value = sidebarFormData;
+  function setSidebarFormData(formData) {
+    sidebarFormData.value = formData;
   }
 
   return {view, sidebarFormData, datasetColumns, nestedView, model, dataset,getChartId,setSidebarFormData}
