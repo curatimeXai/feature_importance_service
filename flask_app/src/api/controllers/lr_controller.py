@@ -101,7 +101,7 @@ def lr_shapley(input):
     classifier.load_model(MODEL_PATH)
     classifier.load_dalex_explainer(EXPLAINER_PATH)
     shapl = classifier.dalex_explainer.predict_parts(scaled_input, N=500, type='shap', B=10)
-    shapl_denormalized = classifier.denormalize_shapley(shapl)
+    shapl_denormalized = classifier.denormalize_shapley(shapl,input)
     return shapl_denormalized.plot(show=False, vcolors=["#371ea3","#f05a71","#8bdcbe"], title='Risk Factors (Comparison)',max_vars=16).to_json()
 
 def lr_ceteris_parabus(input,variable):
