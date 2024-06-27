@@ -16,15 +16,18 @@ const modules = [
     url: `/${dashboardStore.model}/vip`,
     title: 'Variable Importance Chart',
     explanations: [
-      'DALEX\'s variable importance chart provides a visual and easy-to-interpret way to identify the most critical features for your model\'s performance.'
+      'This chart displays how the model would be less accurate if a certain variable would be completely random.',
+      'This chart underlines the importance of a certain variable to the model.',
+      'Drop-out loss refers to the loss function of the mode. The lower the loss function value, the better the model is.',
+      'In this case, the higher the drop-out loss the more important is the variable.'
     ]
   },
   {
     url: `/${dashboardStore.model}/pdp/BMI`,
     title: 'Partial Dependency Chart',
     explanations: [
-      'The x-axis represents the values of the feature you\'re analyzing.',
-      'The y-axis represents the model\'s predicted outcome (e.g., probability for classification, value for regression).',
+      'The x-axis represents the possible values of the feature you\'re analyzing.',
+      'The y-axis represents the model\'s predicted outcome.',
       'The line shows the average prediction across all data points in the training set, for each value on the x-axis. (Remember, all other features are held constant while this average is calculated).'
     ],
   },

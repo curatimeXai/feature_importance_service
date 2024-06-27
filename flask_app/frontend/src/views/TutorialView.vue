@@ -55,7 +55,8 @@ import ScopeToggler from "@/components/ScopeToggler.vue";
               In the overview, we can clearly see that there is a high risk of having heart disease.<br>
               The risk factors are listed from strongest positive risk factors to the worse ones.
             </p>
-            <p>Small example: Not smoking reduces the risk with 3.42%, however being 80 or older increases the risk with 17.89%!</p>
+            <p>Small example: Not smoking reduces the risk with 3.42%, however being 80 or older increases the risk with
+              17.89%!</p>
           </div>
           <img class="col-6" src="@/assets/images/local_dashboard_overview_bad.png" alt="Me as an old person">
         </div>
@@ -81,7 +82,8 @@ import ScopeToggler from "@/components/ScopeToggler.vue";
             <p>
               This chart is rather relevant for comparing the influence of certain risk factors.
             </p>
-            <p>An important difference to the Break Down Chart is that the Shapley Chart calculates an average of possible risk factors order.</p>
+            <p>An important difference to the Break Down Chart is that the Shapley Chart calculates an average of
+              possible risk factors order.</p>
             <p>Small example: General Health = Poor increases in average the risk by 15.6%!</p>
           </div>
           <img class="col-8" src="@/assets/images/local_dashboard_shapley_chart.png" alt="Me as an old person">
@@ -93,12 +95,28 @@ import ScopeToggler from "@/components/ScopeToggler.vue";
           <div>
             <h4>Dataset Charts</h4>
             <p>
-              These Charts serve as an small overview over the current dataset
+              These Charts serve as an small overview over the current dataset.
             </p>
+            <p></p>
           </div>
           <div class="col-8">
             <img class="col-12" src="@/assets/images/global_boolean_columns_percentage.png" alt="Me as an old person">
             <img class="col-12" src="@/assets/images/global_categorical_charts.png" alt="Me as an old person">
+          </div>
+        </div>
+        <div class="flex g-1 mb-1">
+          <div>
+            <p>
+              The boxes represent to most frequent 75% values of the dataset
+            </p>
+            <p>
+              The other 25% are between the margins
+            </p>
+            <p>
+              All other outliers are represented as dots
+            </p>
+          </div>
+          <div class="col-8">
             <img class="col-12" src="@/assets/images/global_numerical_boxplots.png" alt="Me as an old person">
           </div>
         </div>
@@ -106,11 +124,42 @@ import ScopeToggler from "@/components/ScopeToggler.vue";
           <div>
             <h4>Model Charts</h4>
             <p>
-              These Charts serve as an small overview over the current dataset
+              This chart displays how the model would be less accurate if a certain variable would be completely
+              random.
+            </p>
+            <p>This chart underlines the importance of a certain variable to the model.</p>
+            <p>
+              Drop-out loss refers to the loss function of the mode. The lower the loss function value, the better the
+              model is.
+            </p>
+            <p>
+              In this case, the higher the drop-out loss the more important is the variable.
             </p>
           </div>
           <div class="col-8">
             <img class="col-12" src="@/assets/images/global_variable_importance.png" alt="Me as an old person">
+          </div>
+        </div>
+        <div class="flex g-1 mb-1">
+          <div>
+            <h4>Risk by Value (Aggregated)</h4>
+            <p>
+              The x-axis represents the possible values of the feature you're analyzing.
+              regression).
+            </p>
+            <p>
+              The y-axis represents the model's predicted outcome.
+            </p>
+            <p>
+              The line shows the average prediction across all data points in the training set, for each value on the
+              x-axis. (Remember, all other features are held constant while this average is calculated).
+            </p>
+            <p>
+              In this current chart, we can for example see that after a certain threshold of BMI, the risk factor doesn't change.
+              This is mostly because there are few data points above that threshold.
+            </p>
+          </div>
+          <div class="col-8">
             <img class="col-12" src="@/assets/images/global_partial_dependency_chart.png" alt="Me as an old person">
           </div>
         </div>

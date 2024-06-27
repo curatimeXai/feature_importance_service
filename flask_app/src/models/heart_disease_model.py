@@ -42,7 +42,7 @@ class HeartDiseaseClassifier:
         self.X_normalized = pd.DataFrame(self.X_normalized, columns=self.X.columns)
         self.X_train, self.X_temp, self.y_train, self.y_temp = train_test_split(self.X_normalized, self.y,
                                                                                 test_size=0.2, random_state=42)
-        self.X_val, self.X_test, self.y_val, self.y_test = train_test_split(self.X_temp, self.y_temp, test_size=0.5,
+        self.X_dev, self.X_test, self.y_dev, self.y_test = train_test_split(self.X_temp, self.y_temp, test_size=0.5,
                                                                             random_state=42)
         self.model = model
         self.explainer = None
@@ -51,17 +51,17 @@ class HeartDiseaseClassifier:
         print(f"HeartDiseaseClassifier __init__ time: {end - start}")
 
     def train(self, X=None, y=None, epochs=1, batch_size=32, increments=-1, is_dnn=False, callbacks=None):
-        accuracies = []
         train_data = self.X_train if X is None else X
         target_data = self.y_train if y is None else y
         if is_dnn:
             history = self.model.fit(train_data, target_data, epochs=epochs, batch_size=batch_size,
                                      callbacks=callbacks)
             return history.history['accuracy']
+        accuracies = []
         for i in range(epochs):
             if increments == -1:
                 self.model.fit(train_data, target_data)
-                accuracies.append(accuracy_score(self.y_val, self.model.predict(self.X_val)))
+                accuracies.append(accuracy_score(self.y_dev, self.model.predict(self.X_dev)))
                 continue
 
             for j in range(0, len(train_data), increments):
@@ -70,8 +70,8 @@ class HeartDiseaseClassifier:
                 y_batch = target_data[j:end_index]
                 self.model.fit(X_batch, y_batch)
                 if j % increments == 0:
-                    y_pred_val = self.model.predict(self.X_val)
-                    accuracy = accuracy_score(self.y_val, y_pred_val)
+                    y_pred_val = self.model.predict(self.X_dev)
+                    accuracy = accuracy_score(self.y_dev, y_pred_val)
                     accuracies.append(accuracy)
 
         return accuracies
@@ -82,8 +82,8 @@ class HeartDiseaseClassifier:
         return test_accuracy
 
     def log_likelihood(self):
-        y_prob_val = self.model.predict_proba(self.X_val)
-        return log_loss(self.y_val, y_prob_val)
+        y_prob_val = self.model.predict_proba(self.X_dev)
+        return log_loss(self.y_dev, y_prob_val)
 
     def plot_accuracy(self, accuracies):
         plt.plot(range(len(accuracies)), accuracies)

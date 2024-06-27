@@ -18,6 +18,7 @@ const modules = [
     title: 'Break Down Chart',
     explanations: [
       'The intercept stands for the mean probability of having heart disease across the whole dataset.',
+      'The intercept stands for the mean probability of having heart disease across the whole dataset.',
       'The horizontal bars show the contribution of each risk factor.',
       'Positive contribution increases the risk factor and negative contribution decreases it.'
     ]
@@ -28,7 +29,9 @@ const modules = [
       "This chart helps you compare each risk factor and see it's contribution, given the current input.",
       'The intercept stands for the mean probability of having heart disease across the whole dataset.',
       'The horizontal bars show the contribution of each risk factor.',
-      'Positive contribution increases the risk factor and negative contribution decreases it.']
+      'Positive contribution increases the risk factor and negative contribution decreases it.',
+      'The main difference to "Risk Factors (Accumulative)" is that here are multiple permutations averaged given the current input'
+    ]
   },
 ]
 
@@ -47,7 +50,7 @@ const unsubscribe = dashboardStore.$onAction(({name, after}) => {
 onMounted(() => {
   load();
 })
-onBeforeUnmount(()=>{
+onBeforeUnmount(() => {
   unsubscribe();
 })
 
