@@ -13,9 +13,9 @@ const inputValue = ref(Math.floor(props.max / 2)+Math.floor(props.min))
 
 <template>
   <div class="row col-3">
-    <input v-model="inputValue" @input="rangeValue=parseInt(inputValue)" class="mb-05 col-12" type="number" :min="parseInt(min)"
+    <input v-model="inputValue" @input="rangeValue=parseInt(Math.floor(inputValue));" class="mb-05 col-12" type="number" :name="name" :min="parseInt(min)"
            :max="parseInt(max)">
-    <input v-model="rangeValue" @input="inputValue=parseInt(rangeValue)" class="col-12" type="range" step="1" :name="name" :min="parseInt(min)"
+    <input v-model="rangeValue" @input="inputValue=parseInt(Math.floor(rangeValue))" class="col-12" type="range" step="1" :min="parseInt(min)"
            :max="parseInt(max)">
   </div>
 </template>
