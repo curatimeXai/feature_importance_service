@@ -90,9 +90,9 @@ function randomize() {
         const optionsNr = input.options.length
         input.selectedIndex = Math.floor(Math.random() * optionsNr);
       }
-      if (input.type === 'range') {
+      if (input.type === 'number') {
         let randVal = parseInt(Math.random() * (parseInt(input.max) - parseInt(input.min)) + parseInt(input.min))
-        let numberInput = input.parentElement.querySelector('input[type="number"]')
+        let numberInput = input.parentElement.querySelector('input[type="range"]')
         input.value = randVal;
         numberInput.value = randVal
       }
