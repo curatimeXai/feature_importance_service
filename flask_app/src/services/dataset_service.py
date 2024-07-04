@@ -9,12 +9,12 @@ from src.helpers import get_datasets_path
 
 class DatasetService:
     def __init__(self):
-        self.datasets_paths = [
-            get_datasets_path('dataset_2020_2022/2020/heart_2020_cleaned.csv'),
-            get_datasets_path('dataset_2020_2022/2020/heart_2020_cleaned_numerical.csv'),
-            get_datasets_path('dataset_2020_2022/2022/heart_2022_no_nans_numerical.csv'),
-        ]
-        self.kaggle_heart_disease_2020 = pd.read_csv(self.datasets_paths[1])
+        self.datasets_paths = {
+            'unprocessed_kaggle_2020': get_datasets_path('dataset_2020_2022/2020/heart_2020_cleaned.csv'),
+            'processed_kaggle_2020': get_datasets_path('dataset_2020_2022/2020/heart_2020_cleaned_numerical.csv'),
+            'unprocessed_kaggle_2022': get_datasets_path('dataset_2020_2022/2022/heart_2022_no_nans_numerical.csv'),
+        }
+        self.kaggle_heart_disease_2020 = pd.read_csv(self.datasets_paths['processed_kaggle_2020'])
         self.kaggle_heart_disease_2020 = self.kaggle_heart_disease_2020.drop(
             columns=[self.kaggle_heart_disease_2020.columns[0], 'Race'])
         self.kaggle_heart_disease_2020_columns = {

@@ -33,6 +33,12 @@ const modules = [
       'The main difference to "Risk Factors (Accumulative)" is that here are multiple permutations averaged given the current input'
     ]
   },
+     {
+    chartUrl: `/${dashboardStore.model}/ceterisparabus/BMI`,
+    title: 'Ceteris Paribus',
+    explanations: [
+    ]
+  },
 ]
 
 const load = () => {

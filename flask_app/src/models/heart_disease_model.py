@@ -78,7 +78,7 @@ class HeartDiseaseClassifier:
 
     def test_accuracy(self):
         y_pred_test = self.model.predict(self.X_test)
-        test_accuracy = accuracy_score(self.y_test, y_pred_test)
+        test_accuracy = accuracy_score(self.y_test, (np.array(y_pred_test) > 0.5).astype(int).flatten())
         return test_accuracy
 
     def log_likelihood(self):
@@ -208,14 +208,14 @@ class HeartDiseaseClassifier:
         filtered_df[variable] = dalex_result.result['_original_']
         denormalized_original = self.scaler.inverse_transform(filtered_df)
         dalex_result.result['_original_'] = denormalized_original[:, self.X.columns.get_loc(variable)]
-        readable_varnames = []
-        for varname in dalex_result.result['variable']:
-            readable_varnames.append(
-                dataset_service.kaggle_heart_disease_2020_columns[varname]['title'] if 'title' in
-                                                                                       dataset_service.kaggle_heart_disease_2020_columns[
-                                                                                           varname] else varname)
-
-        dalex_result.result['variable'] = readable_varnames
+        # readable_varnames = []
+        # for varname in dalex_result.result['variable']:
+        #     readable_varnames.append(
+        #         dataset_service.kaggle_heart_disease_2020_columns[varname]['title'] if 'title' in
+        #                                                                                dataset_service.kaggle_heart_disease_2020_columns[
+        #                                                                                    varname] else varname)
+        #
+        # dalex_result.result['variable'] = readable_varnames
         return dalex_result
 
     def denormalize_x_y(self, dalex_result, variable):

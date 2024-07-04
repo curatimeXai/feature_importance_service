@@ -114,4 +114,6 @@ def svm_ceteris_parabus(input,variable):
     classifier.load_dalex_explainer(EXPLAINER_PATH)
     cp = classifier.dalex_explainer.predict_profile(scaled_input,variables=[variable])
     cp_denormalized = classifier.denormalize_dalex_dataframe(cp,variable)
-    return cp_denormalized.plot(show=False).to_json()
+    return cp_denormalized.plot(
+        show=False,
+        title=f"Risk Factor {dataset_service.kaggle_heart_disease_2020_columns[variable].get('title', variable)} by value").to_json()

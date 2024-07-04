@@ -11,7 +11,7 @@ load_dotenv()
 dataset_service=DatasetService()
 MODEL_PATH = get_trained_models_path("xgb_model2.pkl")
 EXPLAINER_PATH = get_explainers_path("xgb_explainer2.pkl")
-data_path = dataset_service.datasets_paths[1]
+data_path = dataset_service.datasets_paths['processed_kaggle_2020']
 do_train = True
 classifier = HeartDiseaseClassifier(data_path, model=xgboost.XGBClassifier())
 classifier.load_model(MODEL_PATH)

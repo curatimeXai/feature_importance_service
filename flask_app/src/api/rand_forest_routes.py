@@ -10,7 +10,7 @@ rand_forest_blueprint = Blueprint('rand_forest', __name__, url_prefix='/rand_for
 @rand_forest_blueprint.route('/accuracy', methods=['GET'])
 def get_accuracies():
     result = rand_forest_accuracy()
-    return (jsonify({'accuracy': result}))
+    return jsonify(result)
 
 @rand_forest_blueprint.route('/vipimage', methods=['GET'])
 def get_vip_image():
@@ -56,8 +56,13 @@ def get_overview():
 @rand_forest_blueprint.route('/ceterisparabus/<variable>/', methods=['GET'])
 def get_ceterisparabus(variable):
     input_parameters = request.args.to_dict()
+    dataset_service = DatasetService()
+    input_parameters['BMI'] = str(
+        dataset_service.calculateBMI(input_parameters.get('weight'), input_parameters.get('height')))
+    del input_parameters['weight']
+    del input_parameters['height']
     result = rand_forest_ceteris_parabus(input_parameters,variable)
-    return render_template('plotly_chart.html', chart=result)
+    return result
 @rand_forest_blueprint.route('/modelperformance', methods=['GET'])
 def get_modelperformance():
     result = rand_forest_model_performance()

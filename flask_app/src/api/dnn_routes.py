@@ -10,7 +10,7 @@ dnn_blueprint = Blueprint('dnn', __name__, url_prefix='/dnn')
 @dnn_blueprint.route('/accuracy', methods=['GET'])
 def get_accuracies():
     result = dnn_accuracy()
-    return (jsonify({'accuracy': result}))
+    return jsonify(result)
 
 @dnn_blueprint.route('/vipimage', methods=['GET'])
 def get_vip_image():
@@ -56,8 +56,13 @@ def get_overview():
 @dnn_blueprint.route('/ceterisparabus/<variable>/', methods=['GET'])
 def get_ceterisparabus(variable):
     input_parameters = request.args.to_dict()
+    dataset_service = DatasetService()
+    input_parameters['BMI'] = str(
+        dataset_service.calculateBMI(input_parameters.get('weight'), input_parameters.get('height')))
+    del input_parameters['weight']
+    del input_parameters['height']
     result = dnn_ceteris_parabus(input_parameters,variable)
-    return render_template('plotly_chart.html', chart=result)
+    return result
 @dnn_blueprint.route('/modelperformance', methods=['GET'])
 def get_modelperformance():
     result = dnn_model_performance()

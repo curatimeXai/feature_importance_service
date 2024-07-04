@@ -1,6 +1,5 @@
 <script setup>
 
-import Overlay from "@/components/Overlay.vue";
 import {ref} from "vue";
 import ScopeToggler from "@/components/ScopeToggler.vue";
 

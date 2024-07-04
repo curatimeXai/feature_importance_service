@@ -9,7 +9,7 @@ from src.services.dataset_service import DatasetService
 load_dotenv()
 
 dataset_service=DatasetService()
-data_path = dataset_service.datasets_paths[1]
+data_path = dataset_service.datasets_paths['processed_kaggle_2020']
 MODEL_PATH = get_trained_models_path("svm_model.pkl")
 EXPLAINER_PATH = get_explainers_path("svm_explainer.pkl")
 do_train=True

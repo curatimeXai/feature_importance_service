@@ -1,23 +1,48 @@
 <script setup xmlns="http://www.w3.org/1999/html">
 import {useDashboardStore} from "@/stores/dashboard.js";
+import {computed, onMounted, ref} from "vue";
+import Http from "@/helpers/Http.js";
 
 const dashboardStore = useDashboardStore();
+const accuracy = ref(null)
+const computedAccuracy=computed(()=>{
+  if (accuracy.value!==null) {
+      return (parseFloat(accuracy.value)*100).toLocaleString('en-EN', {minimumFractionDigits: 0, maximumFractionDigits: 2})+'%';
+  }
+  return 0
+})
+function loadAccuracy() {
+  accuracy.value = null
+  Http.get(`/${dashboardStore.model}/accuracy`).then(async (response) => {
+    accuracy.value = await response.json()
+  })
+}
+
+onMounted(() => {
+  loadAccuracy();
+})
 </script>
 
 <template>
   <div class="flex g-1">
-    <label class="row col-6 space-between mt-2" style="align-self: flex-start">
+    <div class="col-6 mt-2">
+      <label class="row space-between mb-1" style="align-self: flex-start">
       <span class="flex v-align-center col-6">
         Current Model
       </span>
-      <select v-model="dashboardStore.model" class="col-6">
-        <option selected value="xgb">XGBoost</option>
-        <option value="svm">Support Vector Machine</option>
-        <option value="rand_forest">Random Forest</option>
-        <option value="dnn">Deep Neural Network</option>
-        <option value="lr">Logistic Regression</option>
-      </select>
-    </label>
+        <select v-model="dashboardStore.model" @change="loadAccuracy" class="col-6">
+          <option selected value="xgb">XGBoost</option>
+          <option value="svm">Support Vector Machine</option>
+          <option value="rand_forest">Random Forest</option>
+          <option value="dnn">Deep Neural Network</option>
+          <option value="lr">Logistic Regression</option>
+        </select>
+      </label>
+      <div class="flex">
+        <div class="col-6">Accuracy:</div>
+        <div class="col-6">{{ accuracy === null ? 'loading...' : computedAccuracy }}</div>
+      </div>
+    </div>
     <div class="col-6" v-if="dashboardStore.model==='xgb'">
       <h4>XGBoost</h4>
       <ul>
