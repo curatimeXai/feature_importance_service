@@ -15,7 +15,6 @@ data_path = dataset_service.datasets_paths['processed_kaggle_2020']
 MODEL_PATH = get_trained_models_path("lr_model2.pkl")
 EXPLAINER_PATH = get_explainers_path("lr_explainer2.pkl")
 
-do_train = True
 classifier = HeartDiseaseClassifier(data_path, model=LogisticRegression())
 accuracies = classifier.train()
 classifier.save_model(MODEL_PATH)

@@ -27,13 +27,11 @@ classifier = HeartDiseaseClassifier(data_path,
                                     data_sample=10000,
                                     model=model)
 classifier.load_model(MODEL_PATH)
-if do_train or not classifier.model_is_saved(MODEL_PATH):
-    print('start training')
-    accuracies = classifier.train(epochs=2, batch_size=32, is_dnn=True)
-    classifier.save_model(MODEL_PATH)
-    classifier.plot_accuracy(accuracies)
-    if len(accuracies) > 1:
-        plt.show()
+accuracies = classifier.train(epochs=2, batch_size=32, is_dnn=True)
+classifier.save_model(MODEL_PATH)
+classifier.plot_accuracy(accuracies)
+if len(accuracies) > 1:
+    plt.show()
 
 classifier.load_dalex_explainer(explainer_path=EXPLAINER_PATH)
 classifier.save_dalex_explainer(EXPLAINER_PATH)

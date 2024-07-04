@@ -16,14 +16,12 @@ do_train=True
 classifier = HeartDiseaseClassifier(data_path,
                                     data_sample=50000,
                                     model=SVC(kernel='linear',probability=True))
-if do_train or not classifier.model_is_saved(MODEL_PATH):
-    print('start training')
-    X_train_with_headers=pd.DataFrame(classifier.X_train, columns=classifier.X.columns)
-    accuracies = classifier.train(X=X_train_with_headers)
-    classifier.save_model(MODEL_PATH)
-    classifier.plot_accuracy(accuracies)
-    if len(accuracies) > 1:
-        plt.show()
+X_train_with_headers=pd.DataFrame(classifier.X_train, columns=classifier.X.columns)
+accuracies = classifier.train(X=X_train_with_headers)
+classifier.save_model(MODEL_PATH)
+classifier.plot_accuracy(accuracies)
+if len(accuracies) > 1:
+    plt.show()
 
 classifier.load_dalex_explainer(explainer_path=EXPLAINER_PATH)
 classifier.save_dalex_explainer(EXPLAINER_PATH)
