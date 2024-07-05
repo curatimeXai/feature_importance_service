@@ -9,8 +9,8 @@ from src.models.heart_disease_model import HeartDiseaseClassifier
 from src.services.dataset_service import DatasetService
 
 
-MODEL_PATH = get_trained_models_path("rand_forest_model2.pkl")
-EXPLAINER_PATH = get_explainers_path("rand_forest_explainer2.pkl")
+MODEL_PATH = get_trained_models_path("rand_forest_model.pkl")
+EXPLAINER_PATH = get_explainers_path("rand_forest_explainer.pkl")
 
 def rand_forest_accuracy():
     dataset_service=DatasetService()

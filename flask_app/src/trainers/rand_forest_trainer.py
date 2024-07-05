@@ -14,13 +14,13 @@ load_dotenv()
 dataset_service=DatasetService()
 data_path = dataset_service.datasets_paths['processed_kaggle_2020']
 
-MODEL_PATH = get_trained_models_path("rand_forest_model2.pkl")
-EXPLAINER_PATH = get_explainers_path("rand_forest_explainer2.pkl")
+MODEL_PATH = get_trained_models_path("rand_forest_model.pkl")
+EXPLAINER_PATH = get_explainers_path("rand_forest_explainer.pkl")
 
 do_train=True
 
 classifier = HeartDiseaseClassifier(data_path,
-                                    model=RandomForestClassifier(n_estimators=25, criterion='gini', random_state=42, max_depth=6))
+                                    model=RandomForestClassifier(n_estimators=10, criterion='gini', random_state=42, max_depth=6, n_jobs=8))
 X_train_with_headers=pd.DataFrame(classifier.X_train, columns=classifier.X.columns)
 accuracies = classifier.train(X=X_train_with_headers)
 classifier.save_model(MODEL_PATH)
