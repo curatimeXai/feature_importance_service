@@ -53,7 +53,7 @@ def get_overview():
     result = xgb_overview(input_parameters)
     return result
 
-@xgb_blueprint.route('/ceterisparabus/<variable>/', methods=['GET'])
+@xgb_blueprint.route('/ceterisparabus/<variable>', methods=['GET'])
 def get_ceterisparabus(variable):
     input_parameters = request.args.to_dict()
     dataset_service = DatasetService()
@@ -68,7 +68,7 @@ def get_modelperformance():
     result = xgb_model_performance()
     return result
 
-@xgb_blueprint.route('/pdp/<variable>/', methods=['GET'])
+@xgb_blueprint.route('/pdp/<variable>', methods=['GET'])
 def get_pdp(variable):
     result = xgb_pdp(variable)
     return result
