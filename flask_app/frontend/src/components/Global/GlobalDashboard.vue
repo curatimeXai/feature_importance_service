@@ -23,7 +23,7 @@ const modules = [
     ]
   },
   {
-    url: `/${dashboardStore.model}/pdp/BMI`,
+    url: `/${dashboardStore.model}/pdp/BMI/`,
     title: 'Partial Dependency Chart',
     explanations: [
       'The x-axis represents the possible values of the feature you\'re analyzing.',

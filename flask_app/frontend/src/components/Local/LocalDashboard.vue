@@ -34,7 +34,7 @@ const modules = [
     ]
   },
      {
-    chartUrl: `/${dashboardStore.model}/ceterisparabus/BMI`,
+    chartUrl: `/${dashboardStore.model}/ceterisparabus/BMI/`,
     title: 'Ceteris Paribus',
     explanations: [
     ]
