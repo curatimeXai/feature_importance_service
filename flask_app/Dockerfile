@@ -41,7 +41,7 @@ EXPOSE 5000
 
 # Run the application.
 CMD if [ "$ENVIRONMENT" = "development" ]; then \
-        gunicorn 'app:app' --bind=0.0.0.0:5000 --reload; \
+        cd /app/frontend && npm run watch && cd /app && gunicorn 'app:app' --bind=0.0.0.0:5000 --reload; \
     else \
-        gunicorn 'app:app' --bind=0.0.0.0:5000 --timeout 180; \
+        cd /app/frontend && npm run build && cd /app && gunicorn 'app:app' --bind=0.0.0.0:5000 --timeout 180; \
     fi

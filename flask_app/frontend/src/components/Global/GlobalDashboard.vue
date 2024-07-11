@@ -18,7 +18,7 @@ const modules = [
     explanations: [
       'This chart displays how the model would be less accurate if a certain variable would be completely random.',
       'This chart underlines the importance of a certain variable to the model.',
-      'Drop-out loss refers to the loss function of the mode. The lower the loss function value, the better the model is.',
+      'Drop-out loss refers to the loss function of the model. The lower the loss function value, the better the model is.',
       'In this case, the higher the drop-out loss the more important is the variable.'
     ]
   },
