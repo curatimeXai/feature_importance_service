@@ -4,7 +4,7 @@ heart_csv <- "/home/alex/UniProjects/BachelorXAI/datasets/dataset_2020_2022/2022
 heart_data <- read.csv(heart_csv)
 # heart_data <- heart_data[1:1000,]
 
-
+# TODO replace this with a script in flaskapp
 for (col in names(heart_data)) {
   print(col)
   print(unique(heart_data[[col]])[1:15])
