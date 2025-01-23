@@ -2,6 +2,8 @@
 
 Owner: Sterian-Alexandru Cristea
 
+URL: bogalusa.numeriqberry.com
+
 This service is a dashboard for exploring ai models for heart disease prediction. This service focuses especially on the
 features of the predictive model and understanding why and how the model predicted something.
 
