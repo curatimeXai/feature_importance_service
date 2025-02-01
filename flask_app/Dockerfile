@@ -22,8 +22,11 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 # Install Node.js and npm
 RUN apt-get update && \
-    apt-get install -y nodejs npm && \
-    npm install -g npm@latest
+    apt-get install -y curl && \
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    npm install -g npm@latest && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Switch to the non-privileged user to run the application.
 # Copy the source code into the container.
@@ -40,8 +43,8 @@ WORKDIR /app
 EXPOSE 5000
 
 # Run the application.
-CMD if [ "$ENVIRONMENT" = "development" ]; then \
-        cd /app/frontend && npm run watch && cd /app && gunicorn 'app:app' --bind=0.0.0.0:5000 --reload; \
+CMD ["/bin/bash", "-c", "if [ \"$ENVIRONMENT\" = \"development\" ]; then \
+        cd /app/frontend && nohup npm run watch > watch.log 2>&1 & cd /app && gunicorn 'app:app' --bind=0.0.0.0:5000 --reload; \
     else \
         cd /app/frontend && npm run build && cd /app && gunicorn 'app:app' --bind=0.0.0.0:5000 --timeout 180; \
-    fi
+    fi"]

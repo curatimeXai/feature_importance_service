@@ -1,7 +1,7 @@
 
 /flask_app/datasets/
-/.idea/.gitignore
-/.idea/Bachelor.iml
+/.idea
+/.idea/Bachelor.imls
 /.idea/misc.xml
 /.idea/modules.xml
 /.idea/inspectionProfiles/profiles_settings.xml
@@ -27,3 +27,4 @@
 /flask_app/.env
 /flask_app/store/
 /flask_app/templates/
+/.idea/prettier.xml
