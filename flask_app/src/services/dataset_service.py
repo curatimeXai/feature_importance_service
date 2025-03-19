@@ -13,6 +13,8 @@ class DatasetService:
             'unprocessed_kaggle_2020': get_datasets_path('dataset_2020_2022/2020/heart_2020_cleaned.csv'),
             'processed_kaggle_2020': get_datasets_path('dataset_2020_2022/2020/heart_2020_cleaned_numerical.csv'),
             'unprocessed_kaggle_2022': get_datasets_path('dataset_2020_2022/2022/heart_2022_no_nans_numerical.csv'),
+            'unprocessed_2025': get_datasets_path('dataset_2025/brfss13.csv'),
+            'processed_2025': get_datasets_path('dataset_2025/brfss13_processed.csv'),
         }
         self.kaggle_heart_disease_2020 = pd.read_csv(self.datasets_paths['processed_kaggle_2020'])
         self.kaggle_heart_disease_2020 = self.kaggle_heart_disease_2020.drop(
@@ -105,6 +107,45 @@ class DatasetService:
                 'explanation': 'How many sleep hours in average'
             },
         }
+        # Gender","Age","BMI","Smoking","Alcohol","Sleep","Exercise","Fruit","Diabetes","Kidney","Stroke","Heartdis"
+        self.heart_disease_2025_columns = {
+            'Gender': {'type': 'category', 'values': {'Male': 1, 'Female': 2}},
+            'Age': {'title': 'Age Category', 'type': 'category', 'values': {
+                "18-24": 1,
+                "25-29": 2,
+                "30-34": 3,
+                "35-39": 4,
+                "40-44": 5,
+                "45-49": 6,
+                "50-54": 7,
+                "55-59": 8,
+                "60-64": 9,
+                "65-69": 10,
+                "70-74": 11,
+                "75-79": 12,
+                "80 or older": 13,
+            }},
+            'BMI': {
+                'type': 'numerical', 'values': [self.kaggle_heart_disease_2020['BMI'].min(),
+                                                self.kaggle_heart_disease_2020['BMI'].max()],
+                'explanation': 'Calculated from height and weight'
+            },
+            'Smoking': {'type': 'category', 'values': {'Not at all': 1, 'Female': 2}}
+            # TODO finish this dictionary with either numerical data like BMI, boolean data or category data (check the upper rows for examples)
+            # 'Alcohol': {'title': 'Has Difficulties Walking', 'type': 'boolean', 'values': {'No': 0, 'Yes': 1},
+            #                 'explanation': 'Currently having difficulties walking or climbing stairs.'},
+            # 'Sleep': {'title': 'Has Physical Activity', 'type': 'boolean', 'values': {'No': 0, 'Yes': 1},
+            #                      'explanation': 'Participated in the past month in physical activities like running, calisthenics, fitness etc.'},
+            # 'Exercise': {'title': 'Has Asthma', 'type': 'boolean', 'values': {'No': 0, 'Yes': 1},
+            #            'explanation': 'Ever had Asthma'},
+            # 'Fruit': {'title': 'Has Kidney Disease', 'type': 'boolean', 'values': {'No': 0, 'Yes': 1},
+            #                   'explanation': 'Ever had a kidney disease'},
+            # 'Diabetes': {'title': 'Has Skin Cancer', 'type': 'boolean', 'values': {'No': 0, 'Yes': 1},
+            #                'explanation': 'Ever had skin cancer'},
+            # 'Kidney': {'type': 'category', 'values': {'Male': 1, 'Female': 2}},
+            # 'Heartdis': ,
+        }
+
 
     def transform_2020_input(self, input):
         transformed_input = []

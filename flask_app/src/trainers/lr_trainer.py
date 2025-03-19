@@ -9,11 +9,12 @@ from src.models.heart_disease_model import HeartDiseaseClassifier
 from src.services.dataset_service import DatasetService
 load_dotenv()
 
+# TODO process brfss13.csv to brfss13_processed.csv
 dataset_service=DatasetService()
-data_path = dataset_service.datasets_paths['processed_kaggle_2020']
+data_path = dataset_service.datasets_paths['processed_2025']
 
-MODEL_PATH = get_trained_models_path("lr_model2.pkl")
-EXPLAINER_PATH = get_explainers_path("lr_explainer2.pkl")
+MODEL_PATH = get_trained_models_path("lr_model_2025.pkl")
+EXPLAINER_PATH = get_explainers_path("lr_explainer_2025.pkl")
 
 classifier = HeartDiseaseClassifier(data_path, model=LogisticRegression())
 accuracies = classifier.train()
@@ -22,7 +23,7 @@ if len(accuracies) > 1:
     classifier.plot_accuracy(accuracies)
     plt.show()
 
-classifier.load_dalex_explainer(explainer_path=EXPLAINER_PATH)
+# classifier.load_dalex_explainer(explainer_path=EXPLAINER_PATH)
 classifier.save_dalex_explainer(EXPLAINER_PATH)
 test_accuracy = classifier.test_accuracy()
 log_likelihood = classifier.log_likelihood()
